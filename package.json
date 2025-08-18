@@ -1,0 +1,53 @@
+{
+  "name": "electron-tools",
+  "productName": "Electron Tools",
+  "version": "1.0.0",
+  "description": "现代化的Electron桌面工具应用，基于Vue 3构建",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "chcp 65001 && electron-forge start",
+    "dev": "chcp 65001 && concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite --mode development",
+    "dev:electron": "wait-on http://localhost:5173 && electron src/main/index.js --dev",
+    "build": "vite build && electron-builder",
+    "package": "chcp 65001 && electron-forge package",
+    "make": "chcp 65001 && electron-forge make",
+    "preview": "vite preview",
+    "lint": "chcp 65001 && eslint . --ext .js,.jsx,.ts,.tsx,.vue",
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [
+    "electron",
+    "vue",
+    "desktop",
+    "tools",
+    "cross-platform"
+  ],
+  "author": {
+    "name": "Jian",
+    "email": "770733914@qq.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-deb": "^7.8.3",
+    "@electron-forge/maker-rpm": "^7.8.3",
+    "@electron-forge/maker-squirrel": "^7.8.3",
+    "@electron-forge/maker-zip": "^7.8.3",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.3",
+    "@electron-forge/plugin-fuses": "^7.8.3",
+    "@electron/fuses": "^1.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "concurrently": "^8.2.2",
+    "electron": "37.3.0",
+    "electron-builder": "^24.9.1",
+    "electron-reload": "^2.0.0-alpha.1",
+    "nodemon": "^3.0.2",
+    "vite": "^5.2.0",
+    "wait-on": "^7.2.0"
+  }
+}

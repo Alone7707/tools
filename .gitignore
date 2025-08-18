@@ -1,0 +1,25 @@
+# Build outputs
+build/
+dist/
+release/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
