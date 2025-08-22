@@ -1,7 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import './styles/global.css'
+import pinia from './stores'
+import { useThemeStore } from '@/stores/theme'
+
+import './assets/styles/global.css'
 
 // 检查electronAPI是否可用
 if (window.electronAPI) {
@@ -34,6 +37,10 @@ if (window.electronAPI) {
 const app = createApp(App)
 // 全局属性
 app.config.globalProperties.$electron = window.electronAPI
-console.log("🚀 ~ window.electronAPI:", window.electronAPI)
 
-app.use(router).mount('#app')
+
+app.use(router).use(pinia).mount('#app')
+
+// 初始化主题
+const themeStore = useThemeStore()
+themeStore.initTheme()

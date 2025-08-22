@@ -7,16 +7,6 @@ const routes = [
     component: () => import('../views/DashboardView.vue')
   },
   {
-    path: '/tools',
-    name: 'Tools',
-    component: () => import('../views/ToolsView.vue')
-  },
-  {
-    path: '/files',
-    name: 'Files',
-    component: () => import('../views/FilesView.vue')
-  },
-  {
     path: '/settings',
     name: 'Settings',
     component: () => import('../views/SettingsView.vue')

@@ -2,14 +2,9 @@
   <div class="dashboard">
     <h1>欢迎使用 Electron Tools</h1>
     <p>这是一个现代化的Electron桌面应用，提供丰富的工具集。</p>
-    
+
     <div class="stats-grid">
-      <StatCard 
-        v-for="stat in stats" 
-        :key="stat.title"
-        :title="stat.title" 
-        :value="stat.value" 
-      />
+      <StatCard v-for="stat in stats" :key="stat.title" :title="stat.title" :value="stat.value" />
     </div>
   </div>
 </template>
@@ -32,7 +27,7 @@ const calculateUptime = () => {
   const seconds = Math.floor(elapsed / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
-  
+
   if (hours > 0) {
     return `${hours}小时 ${minutes % 60}分钟`
   } else if (minutes > 0) {
@@ -53,24 +48,24 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .dashboard {
   padding: 20px;
-}
 
-.dashboard h1 {
-  color: #333;
-  margin-bottom: 10px;
-}
+  h1 {
+    color: #333;
+    margin-bottom: 10px;
+  }
 
-.dashboard p {
-  color: #666;
-  margin-bottom: 30px;
-}
+  p {
+    color: #666;
+    margin-bottom: 30px;
+  }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
 }
 </style>
