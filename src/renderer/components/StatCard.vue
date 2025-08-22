@@ -20,14 +20,15 @@ defineProps({
 
 <style scoped>
 .stat-card {
-  background: white;
+  background: var(--card-background, white);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 
   h3 {
     margin: 0 0 10px 0;
-    color: #666;
+    color: var(--text-secondary-color, #666);
     font-size: 14px;
   }
 
@@ -35,7 +36,7 @@ defineProps({
     margin: 0;
     font-size: 24px;
     font-weight: bold;
-    color: #333;
+    color: var(--text-color);
   }
 }
 </style>

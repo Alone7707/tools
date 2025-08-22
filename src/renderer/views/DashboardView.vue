@@ -51,14 +51,15 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .dashboard {
   padding: 20px;
+  background: var(--background-color);
 
   h1 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 10px;
   }
 
   p {
-    color: #666;
+    color: var(--text-secondary-color, #666);
     margin-bottom: 30px;
   }
 

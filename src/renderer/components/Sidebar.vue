@@ -19,20 +19,19 @@ const menuItems = [
 <style lang="scss" scoped>
 .sidebar {
   width: 200px;
-  background: #f8f9fa;
-  border-right: 1px solid #dee2e6;
+  background: var(--background-color);
+  border-right: 1px solid var(--border-color);
 
   .nav-item {
     display: block;
     padding: 12px 20px;
-    color: #495057;
+    color: var(--text-color);
     text-decoration: none;
     transition: all 0.3s ease;
 
     &:hover {
-      background: #e9ecef;
+      background: rgba(var(--primary-color-rgb), 0.1);
     }
-
 
     .icon {
       margin-right: 8px;
@@ -40,7 +39,7 @@ const menuItems = [
   }
 
   .active {
-    background: #667eea;
+    background: var(--primary-color);
     color: white;
   }
 }

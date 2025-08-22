@@ -46,18 +46,23 @@ watch(() => themeStore.isDark, (isDark) => {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: #f8f9fa;
+  background: var(--background-color);
+  color: var(--text-color);
+  
   #app {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    
     .main-container {
       display: flex;
       flex: 1;
       height: calc(100vh - 50px);
+      
       .content {
         flex: 1;
         overflow-y: auto;
+        background: var(--background-color);
       }
     }
   }

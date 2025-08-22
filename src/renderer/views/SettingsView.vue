@@ -27,9 +27,10 @@ const changeTheme = () => themeStore.toggleTheme()
 <style lang="scss" scoped>
 .settings {
   padding: 20px;
+  background: var(--background-color);
 
   h1 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 20px;
   }
 
@@ -41,19 +42,22 @@ const changeTheme = () => themeStore.toggleTheme()
       justify-content: space-between;
       align-items: center;
       padding: 15px;
-      background: white;
+      background: var(--card-background, white);
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
 
       label {
         font-weight: bold;
-        color: #333;
+        color: var(--text-color);
       }
 
       select {
         padding: 5px 10px;
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color);
         border-radius: 4px;
+        background: var(--input-background, white);
+        color: var(--text-color);
       }
     }
   }

@@ -4,7 +4,11 @@
   --secondary-color: #764ba2;
   --background-color: #f8f9fa;
   --text-color: #333;
+  --text-secondary-color: #666;
   --border-color: #dee2e6;
+  --card-background: white;
+  --input-background: white;
+  --primary-color-rgb: 102, 126, 234;
 }
 
 .dark {
@@ -12,7 +16,11 @@
   --secondary-color: #667eea;
   --background-color: #1a1a1a;
   --text-color: #fff;
+  --text-secondary-color: #ccc;
   --border-color: #333;
+  --card-background: #2d2d2d;
+  --input-background: #3d3d3d;
+  --primary-color-rgb: 118, 75, 162;
 }
 
 * {
