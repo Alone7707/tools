@@ -1,6 +1,5 @@
 const { app } = require('electron');
 const WindowManager = require('./window');
-const AppMenu = require('./menu');
 const IPCManager = require('./ipc');
 
 // 处理在Windows上安装/卸载时创建/删除快捷方式
@@ -11,27 +10,23 @@ if (require('electron-squirrel-startup')) {
 class ElectronApp {
   constructor() {
     this.windowManager = new WindowManager();
-    this.appMenu = new AppMenu();
     this.ipcManager = null;
   }
 
   async initialize() {
     try {
       await app.whenReady();
-      
+
       console.log('📱 Electron 已就绪，创建应用窗口...');
-      
-      // 初始化菜单
-      this.appMenu.build();
-      
+
       // 创建主窗口
       const mainWindow = this.windowManager.createMainWindow();
-      
+
       // 初始化IPC通信
       this.ipcManager = new IPCManager(this.windowManager);
-      
+
       console.log('🎉 Electron Tools 应用已启动！');
-      
+
     } catch (error) {
       console.error('❌ 应用启动失败:', error);
     }

@@ -4,18 +4,25 @@
     <div class="settings-grid">
       <div class="setting-item">
         <label>主题:</label>
-        <select :value="currentTheme" @change="changeTheme">
-          <option value="light">浅色</option>
-          <option value="dark">深色</option>
-        </select>
+        <Select
+          v-model="currentTheme"
+          :options="themeOptions"
+          @change="changeTheme"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useThemeStore } from '@/stores/theme'
+import Select from '@/components/Select.vue'
+
+const themeOptions = [
+  { value: 'light', label: '浅色' },
+  { value: 'dark', label: '深色' }
+]
 
 const themeStore = useThemeStore()
 
@@ -35,9 +42,10 @@ const changeTheme = () => themeStore.toggleTheme()
   }
 
   .settings-grid {
-    max-width: 400px;
+    max-width: 100%;
 
     .setting-item {
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -48,6 +56,7 @@ const changeTheme = () => themeStore.toggleTheme()
       border: 1px solid var(--border-color);
 
       label {
+        width: 100px;
         font-weight: bold;
         color: var(--text-color);
       }
