@@ -12,11 +12,6 @@ const routes = [
     component: () => import('../views/SettingsView.vue')
   },
   {
-    path: '/form-demo',
-    name: 'FormDemo',
-    component: () => import('../views/FormDemoView.vue')
-  },
-  {
     path: '/advanced-form',
     name: 'AdvancedForm',
     component: () => import('../views/AdvancedFormDemoView.vue')
@@ -25,7 +20,7 @@ const routes = [
     path: '/button-demo',
     name: 'ButtonDemo',
     component: () => import('../views/ButtonDemoView.vue')
-  }
+  },
 ]
 
 const router = createRouter({

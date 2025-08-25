@@ -1,26 +1,32 @@
 <template>
   <aside class="sidebar">
-    <nav>
-      <router-link v-for="item in menuItems" :key="item.path" :to="item.path" class="nav-item" active-class="active">
+    <nav style="height: 100%;">
+      <!-- <router-link v-for="item in menuItems" :key="item.path" :to="item.path" class="nav-item" active-class="active">
         <span class="icon">{{ item.icon }}</span>
         <span class="name">{{ item.name }}</span>
-      </router-link>
+      </router-link> -->
+      <BaseMenu :items="menuItems" title="导航菜单" @menu-click="handleMenuClick" />
     </nav>
   </aside>
 </template>
 
 <script setup>
+import BaseMenu from "@/components/BaseMenu.vue";
 const menuItems = [
-  { path: '/', name: '仪表盘', icon: '📊' },
-  { path: '/advanced-form', name: '高级表单', icon: '📨' },
-  { path: '/button-demo', name: '按钮演示', icon: '🔘' },
-  { path: '/settings', name: '设置', icon: '⚙️' }
+  { path: "/", title: "仪表盘", icon: "📊" },
+  {
+    key: "components-demo", title: "组件演示", icon: "🧩", children: [
+      { path: "/advanced-form", title: "高级表单", icon: "📨" },
+      { path: "/button-demo", title: "按钮演示", icon: "🔘" },
+    ]
+  },
+  { path: "/settings", title: "设置", icon: "⚙️" }
 ]
 </script>
 
 <style lang="scss" scoped>
 .sidebar {
-  width: 200px;
+  // width: 200px;
   background: var(--background-color);
   border-right: 1px solid var(--border-color);
 

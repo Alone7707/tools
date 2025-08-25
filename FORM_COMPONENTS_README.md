@@ -10,6 +10,7 @@
 - [基础输入组件](#基础输入组件)
 - [选择组件](#选择组件)
 - [按钮组件](#按钮组件)
+- [导航组件](#导航组件)
 - [表单系统组件](#表单系统组件)
 - [验证规则系统](#验证规则系统)
 - [完整使用示例](#完整使用示例)
@@ -306,6 +307,178 @@ const options = [
 <!-- 块级按钮 -->
 <BaseButton type="primary" block>块级按钮</BaseButton>
 ```
+
+## 导航组件
+
+### BaseMenu - 菜单组件
+
+功能强大的导航菜单组件，支持一级和二级菜单、简略版切换、手风琴模式等。
+
+#### 基本用法
+
+```vue
+<BaseMenu 
+  :items="menuItems"
+  title="导航菜单"
+  @menu-click="handleMenuClick"
+/>
+```
+
+#### Props
+
+| 属性名 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| items | Array | [] | 菜单数据 |
+| title | String | '导航菜单' | 菜单标题 |
+| defaultCollapsed | Boolean | false | 是否默认收起 |
+| alwaysExpanded | Boolean | false | 是否总是展开二级菜单 |
+| defaultExpandedGroups | Array | [] | 默认展开的分组 |
+| accordion | Boolean | false | 是否启用手风琴模式 |
+| width | String | '200px' | 菜单宽度（展开时） |
+| collapsedWidth | String | '64px' | 菜单宽度（收起时） |
+
+#### 事件
+
+- `update:collapsed` - 收起状态改变事件
+- `menu-click` - 菜单项点击事件
+- `group-toggle` - 分组切换事件
+
+#### 插槽
+
+- `footer` - 菜单底部内容，提供 `collapsed` 参数
+
+#### 方法
+
+- `toggleCollapse()` - 切换收起状态
+- `toggleGroup(groupKey)` - 切换分组展开状态
+- `expandGroup(groupKey)` - 展开指定分组
+- `collapseGroup(groupKey)` - 收起指定分组
+- `expandAll()` - 展开所有分组
+- `collapseAll()` - 收起所有分组
+
+#### 菜单数据格式
+
+```javascript
+const menuItems = [
+  // 一级菜单项
+  {
+    path: '/dashboard',
+    title: '仪表盘',
+    icon: '📊',
+    badge: '3' // 可选徽标
+  },
+  // 二级菜单组
+  {
+    key: 'components', // 必须唯一
+    title: '组件库',
+    icon: '🧩',
+    badge: 'New',
+    children: [
+      {
+        path: '/button-demo',
+        title: '按钮组件',
+        icon: '🔘',
+        badge: '2'
+      },
+      {
+        path: '/menu-demo',
+        title: '菜单组件',
+        icon: '📑'
+      }
+    ]
+  }
+]
+```
+
+#### 使用示例
+
+```vue
+<template>
+  <BaseMenu 
+    ref="menuRef"
+    :items="menuItems"
+    title="管理后台"
+    :default-collapsed="false"
+    :accordion="true"
+    width="240px"
+    collapsed-width="60px"
+    @menu-click="handleMenuClick"
+    @update:collapsed="handleCollapseChange"
+  >
+    <template #footer="{ collapsed }">
+      <div class="menu-footer">
+        <div v-if="!collapsed" class="user-info">
+          <div class="avatar">👤</div>
+          <div class="details">
+            <div class="name">管理员</div>
+            <div class="role">Admin</div>
+          </div>
+        </div>
+        <BaseButton 
+          v-else
+          type="text" 
+          icon="👤"
+          title="用户信息"
+        />
+      </div>
+    </template>
+  </BaseMenu>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import BaseMenu from '@/components/BaseMenu.vue'
+
+const menuRef = ref()
+
+const menuItems = [
+  { path: '/', title: '仪表盘', icon: '📊' },
+  {
+    key: 'system',
+    title: '系统管理',
+    icon: '⚙️',
+    children: [
+      { path: '/users', title: '用户管理', icon: '👥' },
+      { path: '/settings', title: '系统设置', icon: '⚙️' }
+    ]
+  }
+]
+
+const handleMenuClick = (item) => {
+  console.log('菜单点击:', item)
+}
+
+const handleCollapseChange = (collapsed) => {
+  // 保存用户偏好
+  localStorage.setItem('menuCollapsed', collapsed)
+}
+
+// 程序化控制
+const toggleMenu = () => {
+  menuRef.value.toggleCollapse()
+}
+</script>
+```
+
+#### 特性说明
+
+1. **简略版模式**
+   - 收起后只显示图标，节省空间
+   - 鼠标悬停在分组上显示浮动子菜单
+   - 支持自定义收起宽度
+
+2. **手风琴模式**
+   - 同时只能展开一个分组
+   - 适用于菜单项较多的场景
+
+3. **自动路由适配**
+   - 自动根据当前路由高亮菜单项
+   - 自动展开包含当前路由的分组
+
+4. **丰富的交互反馈**
+   - 流畅的展开/收起动画
+   - 悬停和激活状态效果
+   - 支持徽标显示
 
 ## 表单系统组件
 
@@ -928,6 +1101,61 @@ h3 {
 <BaseButton type="primary">按钮1</BaseButton>
 <BaseButton type="primary">按钮2</BaseButton>
 <BaseButton type="primary">按钮3</BaseButton>
+```
+
+#### BaseMenu 使用技巧
+```vue
+<!-- 推荐：合理的菜单层级结构 -->
+<BaseMenu 
+  :items="menuItems"
+  title="管理后台"
+  :accordion="true"
+  @menu-click="handleMenuClick"
+>
+  <template #footer="{ collapsed }">
+    <UserProfile :collapsed="collapsed" />
+  </template>
+</BaseMenu>
+
+<!-- 推荐：使用程序化控制 -->
+<BaseButton @click="menuRef.toggleCollapse()">切换菜单</BaseButton>
+<BaseButton @click="menuRef.expandAll()">展开所有</BaseButton>
+
+<!-- 推荐：合理的数据结构 -->
+const menuItems = [
+  // 一级菜单 - 简单直接
+  { path: '/dashboard', title: '仪表盘', icon: '📊' },
+  
+  // 二级菜单 - 按功能分组
+  {
+    key: 'content',
+    title: '内容管理',
+    icon: '📝',
+    children: [
+      { path: '/articles', title: '文章管理', icon: '📝' },
+      { path: '/categories', title: '分类管理', icon: '📁' }
+    ]
+  }
+]
+
+<!-- 推荐：保存用户偏好 -->
+const handleCollapseChange = (collapsed) => {
+  localStorage.setItem('menuCollapsed', JSON.stringify(collapsed))
+}
+
+<!-- 避免：过深的层级结构 -->
+// 不推荐超过2级的菜单结构
+{
+  key: 'level1',
+  children: [
+    {
+      key: 'level2',
+      children: [
+        { path: '/level3' } // 过深！
+      ]
+    }
+  ]
+}
 ```
 
 #### 验证规则组合
