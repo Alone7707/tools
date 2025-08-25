@@ -12,6 +12,8 @@
 <script setup>
 const menuItems = [
   { path: '/', name: '仪表盘', icon: '📊' },
+  { path: '/advanced-form', name: '高级表单', icon: '📨' },
+  { path: '/button-demo', name: '按钮演示', icon: '🔘' },
   { path: '/settings', name: '设置', icon: '⚙️' }
 ]
 </script>

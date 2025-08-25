@@ -1,13 +1,9 @@
 <template>
   <div id="app">
-    <TitleBar 
-      @minimize="handleMinimize"
-      @maximize="handleMaximize"
-      @close="handleClose"
-    />
+    <TitleBar @minimize="handleMinimize" @maximize="handleMaximize" @close="handleClose" />
 
     <div class="main-container">
-      <SideBar />
+      <Sidebar />
       <main class="content">
         <router-view />
       </main>
@@ -19,7 +15,7 @@
 import { useThemeStore } from '@/stores/theme'
 import { watch } from 'vue'
 import TitleBar from './components/TitleBar.vue'
-import SideBar from './components/SideBar.vue'
+import Sidebar from './components/Sidebar.vue'
 
 const handleMinimize = () => window.electronAPI?.windowMinimize()
 const handleMaximize = () => window.electronAPI?.windowMaximize()
@@ -48,17 +44,17 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background: var(--background-color);
   color: var(--text-color);
-  
+
   #app {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    
+
     .main-container {
       display: flex;
       flex: 1;
       height: calc(100vh - 50px);
-      
+
       .content {
         flex: 1;
         overflow-y: auto;

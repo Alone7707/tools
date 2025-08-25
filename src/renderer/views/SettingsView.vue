@@ -4,7 +4,7 @@
     <div class="settings-grid">
       <div class="setting-item">
         <label>主题:</label>
-        <Select
+        <BaseSelect
           v-model="currentTheme"
           :options="themeOptions"
           @change="changeTheme"
@@ -17,7 +17,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useThemeStore } from '@/stores/theme'
-import Select from '@/components/Select.vue'
+import BaseSelect from '@/components/BaseSelect.vue'
 
 const themeOptions = [
   { value: 'light', label: '浅色' },
