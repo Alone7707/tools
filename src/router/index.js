@@ -14,17 +14,17 @@ const routes = [
   {
     path: '/advanced-form',
     name: 'AdvancedForm',
-    component: () => import('../views/AdvancedFormDemoView.vue')
+    component: () => import('../views/demo/AdvancedFormDemoView.vue')
   },
   {
     path: '/button-demo',
     name: 'ButtonDemo',
-    component: () => import('../views/ButtonDemoView.vue')
+    component: () => import('../views/demo/ButtonDemoView.vue')
   },
   {
     path: '/editor-demo',
     name: 'editorDemo',
-    component: () => import('../views/EditorDemoView.vue')
+    component: () => import('../views/demo/EditorDemoView.vue')
   },
   {
     path: '/tools',
@@ -39,12 +39,12 @@ const routes = [
   {
     path: '/electron-demo',
     name: 'ElectronDemo',
-    component: () => import('../views/ElectronDemoView.vue')
+    component: () => import('../views/demo/ElectronDemoView.vue')
   },
   {
     path: '/loading-demo',
     name: 'LoadingDemo',
-    component: () => import('../views/LoadingDemoView.vue')
+    component: () => import('../views/demo/LoadingDemoView.vue')
   }
 ]
 

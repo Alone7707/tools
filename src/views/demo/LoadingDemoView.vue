@@ -34,21 +34,21 @@
 
 <script setup>
 import { ref, getCurrentInstance } from 'vue'
-import Loading from '../components/Loading.vue'
+import Loading from '@/components/Loading.vue'
 
 const { proxy } = getCurrentInstance()
-const loadingVisible = ref(false)
 
 // 显示全局loading
 const showGlobalLoading = () => {
   proxy.$loading.show('全局方法调用中...')
-  loadingVisible.value = true
+  setTimeout(() => {
+    proxy.$loading.hide()
+  }, 3000);
 }
 
 // 隐藏全局loading
 const hideGlobalLoading = () => {
   proxy.$loading.hide()
-  loadingVisible.value = false
 }
 </script>
 
