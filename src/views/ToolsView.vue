@@ -174,6 +174,22 @@ const tools = [
       '图片上传'
     ]
   },
+  {
+    id: 4,
+    routerName: 'EncoderDecoder',
+    name: '加解密编码',
+    description: '加解密编码工具',
+    icon: '🔐',
+    category: 'development',
+    rating: 5,
+    version: '1.0.0',
+    isNew: true,
+    fullDescription: '加解密编码工具',
+    features: [
+      '加解密',
+      '支持Base64、Url、MD5、SHA1、SHA256编码/解码',
+    ]
+  }
 ]
 
 // 路由

@@ -47,6 +47,11 @@ const routes = [
     component: () => import('../views/tools/ImageCompressorView.vue')
   },
   {
+    path: '/tools/encoder-decoder',
+    name: 'EncoderDecoder',
+    component: () => import('../views/tools/EncoderDecoderView.vue')
+  },
+  {
     path: '/electron-demo',
     name: 'ElectronDemo',
     component: () => import('../views/demo/ElectronDemoView.vue')
