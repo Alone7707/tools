@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { getCurrentInstance } from 'vue'
 import Loading from '@/components/Loading.vue'
 
 const { proxy } = getCurrentInstance()

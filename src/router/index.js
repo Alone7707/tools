@@ -37,6 +37,11 @@ const routes = [
     component: () => import('../views/tools/S2WorkParserView.vue')
   },
   {
+    path: '/tools/json-formatter',
+    name: 'JsonFormatter',
+    component: () => import('../views/tools/JsonFormatterView.vue')
+  },
+  {
     path: '/electron-demo',
     name: 'ElectronDemo',
     component: () => import('../views/demo/ElectronDemoView.vue')

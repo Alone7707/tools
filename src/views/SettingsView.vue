@@ -609,7 +609,7 @@ const applyPresetTheme = (themeName) => {
   }
 
   .custom-theme-settings {
-    margin-top: 15px;
+    margin: 15px 0;
     padding: 15px;
     background: var(--card-background, white);
     border-radius: 8px;
@@ -664,9 +664,26 @@ const applyPresetTheme = (themeName) => {
 
     .custom-theme-color {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       grid-gap: 12px;
+      max-width: 100%;
+      overflow: hidden;
 
+      .setting-item {
+        label {
+          flex: 0 0 120px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .color-picker-wrapper {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
     }
   }
 }

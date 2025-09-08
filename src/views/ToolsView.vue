@@ -143,10 +143,10 @@ const tools = [
   },
   {
     id: 2,
-    routerName: 'jsonFormatter',
+    routerName: 'JsonFormatter',
     name: 'JSON格式化',
     description: '把JSON字符串格式化，方便阅读。',
-    icon: '📊',
+    icon: '📝',
     category: 'development',
     rating: 5,
     version: '1.0.0',
