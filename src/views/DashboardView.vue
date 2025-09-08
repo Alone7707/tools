@@ -405,6 +405,7 @@ onMounted(async () => {
       gap: 20px;
 
       .monitor-card {
+        min-height: 220px;
         background: var(--card-background);
         border: 1px solid var(--border-color);
         border-radius: 12px;
