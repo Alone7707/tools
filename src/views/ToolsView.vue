@@ -147,7 +147,7 @@ const tools = [
     name: 'JSON格式化',
     description: '把JSON字符串格式化，方便阅读。',
     icon: '📝',
-    category: 'development',
+    category: 'productivity',
     rating: 5,
     version: '1.0.0',
     isNew: true,
@@ -156,6 +156,22 @@ const tools = [
       'JSON格式化',
       'JSON校验',
       'JSON压缩'
+    ]
+  },
+  {
+    id: 3,
+    routerName: 'ImageCompressor',
+    name: '图片压缩',
+    description: '把图片压缩，方便上传。',
+    icon: '🖼️',
+    category: 'multimedia',
+    rating: 5,
+    version: '1.0.0',
+    isNew: true,
+    fullDescription: '把图片体积压缩，方便上传。',
+    features: [
+      '图片压缩',
+      '图片上传'
     ]
   },
 ]
