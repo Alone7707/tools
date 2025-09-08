@@ -645,16 +645,16 @@ defineExpose({
     }
 
     .menu-popup-icon {
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-    font-size: 14px;
-    color: var(--icon-color, var(--text-color));
-    transition: color 0.2s ease;
-  }
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-size: 14px;
+      color: var(--icon-color, var(--text-color));
+      transition: color 0.2s ease;
+    }
 
     .menu-popup-text {
       flex: 1;

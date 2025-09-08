@@ -12,6 +12,81 @@
       </div>
     </div>
 
+    <!-- 系统监控卡片 -->
+    <div class="section">
+      <h2>系统监控</h2>
+      <div class="system-monitor-grid">
+        <div class="monitor-card cpu-card">
+          <div class="card-header">
+            <h3>CPU使用率</h3>
+            <span class="card-icon">🖥️</span>
+          </div>
+          <div class="card-content">
+            <div class="big-number" :class="getCpuClass()">
+              {{ systemMetrics.cpu.usage }}%
+            </div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="label">核心数:</span>
+                <span class="value">{{ systemMetrics.cpu.cores || 0 }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">型号:</span>
+                <span class="value">{{ systemMetrics.cpu.model || '未知' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: systemMetrics.cpu.usage + '%' }"></div>
+          </div>
+        </div>
+
+        <div class="monitor-card memory-card">
+          <div class="card-header">
+            <h3>内存使用</h3>
+            <span class="card-icon">🧠</span>
+          </div>
+          <div class="card-content">
+            <div class="big-number" :class="getMemoryClass()">
+              {{ systemMetrics.memory.usage }}%
+            </div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="label">已用:</span>
+                <span class="value">{{ formatBytes(systemMetrics.memory.used) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">总计:</span>
+                <span class="value">{{ formatBytes(systemMetrics.memory.total) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: systemMetrics.memory.usage + '%' }"></div>
+          </div>
+        </div>
+
+        <div class="monitor-card network-card">
+          <div class="card-header">
+            <h3>网络状态</h3>
+            <span class="card-icon">🌐</span>
+          </div>
+          <div class="card-content">
+            <div class="network-stats">
+              <div class="network-item">
+                <span class="label">▲ 上传:</span>
+                <span class="value">{{ formatBytes(systemMetrics.network.uploadSpeed) }}/s</span>
+              </div>
+              <div class="network-item">
+                <span class="label">▼ 下载:</span>
+                <span class="value">{{ formatBytes(systemMetrics.network.downloadSpeed) }}/s</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 系统信息卡片 -->
     <div class="section">
       <h2>系统信息</h2>
@@ -71,11 +146,6 @@
           <h3>文件管理</h3>
           <p>浏览和管理本地文件</p>
         </div>
-        <div class="feature-card" @click="showSystemInfo">
-          <div class="feature-icon">📊</div>
-          <h3>系统监控</h3>
-          <p>查看系统性能和资源</p>
-        </div>
       </div>
     </div>
 
@@ -108,6 +178,11 @@ import StatCard from '../components/StatCard.vue'
 import pkg from '../../package.json'
 
 const systemInfo = ref({})
+const systemMetrics = ref({
+  cpu: { usage: 0, cores: 0, model: '' },
+  memory: { usage: 0, used: 0, total: 0 },
+  network: { uploadSpeed: 0, downloadSpeed: 0 }
+})
 const recentActivities = ref([])
 const isDev = ref(process.env.NODE_ENV === 'development')
 const appVersion = ref(pkg.version)
@@ -122,6 +197,60 @@ const fetchSystemInfo = async () => {
       console.error('获取系统信息失败:', error)
     }
   }
+}
+
+// 获取系统监控数据
+const fetchSystemMetrics = async () => {
+  try {
+    const metrics = await window.electronAPI.getSystemMetrics()
+
+    // 计算使用率并确保数据完整
+    const memoryUsage = metrics.memory.total > 0 ?
+      Math.round((metrics.memory.used / metrics.memory.total) * 100) : 0;
+
+    systemMetrics.value = {
+      cpu: {
+        usage: metrics.cpu.usage || 0,
+        cores: metrics.cpu.cores || 4,
+        model: metrics.cpu.model || '未知'
+      },
+      memory: {
+        usage: memoryUsage,
+        used: metrics.memory.used || 0,
+        total: metrics.memory.total || 0
+      },
+      network: {
+        uploadSpeed: metrics.network?.uploadSpeed || 0,
+        downloadSpeed: metrics.network?.downloadSpeed || 0
+      }
+    }
+  } catch (error) {
+    console.error('获取系统监控数据失败:', error)
+  }
+}
+
+// 格式化字节
+const formatBytes = (bytes) => {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// 获取CSS类名
+const getCpuClass = () => {
+  const usage = systemMetrics.value.cpu.usage
+  if (usage > 80) return 'critical'
+  if (usage > 60) return 'warning'
+  return 'normal'
+}
+
+const getMemoryClass = () => {
+  const usage = systemMetrics.value.memory.usage
+  if (usage > 90) return 'critical'
+  if (usage > 70) return 'warning'
+  return 'normal'
 }
 
 // 添加活动记录
@@ -159,11 +288,6 @@ const openFileExplorer = async () => {
   }
 }
 
-// 显示系统信息
-const showSystemInfo = () => {
-  addActivity('系统监控', '查看系统性能和资源', '📊')
-}
-
 // 格式化时间
 const formatTime = (timestamp) => {
   const date = new Date(timestamp)
@@ -183,6 +307,12 @@ const formatTime = (timestamp) => {
 
 onMounted(async () => {
   await fetchSystemInfo()
+  await fetchSystemMetrics()
+
+  // 每5秒自动刷新监控数据
+  setInterval(() => {
+    fetchSystemMetrics()
+  }, 5000)
 })
 </script>
 
@@ -265,6 +395,117 @@ onMounted(async () => {
 
         &:hover {
           text-decoration: underline;
+        }
+      }
+    }
+
+    .system-monitor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+
+      .monitor-card {
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+
+          h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 16px;
+          }
+
+          .card-icon {
+            font-size: 24px;
+          }
+        }
+
+        .card-content {
+          .big-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 12px;
+
+            &.normal {
+              color: var(--success-color, #28a745);
+            }
+
+            &.warning {
+              color: var(--warning-color, #ffc107);
+            }
+
+            &.critical {
+              color: var(--danger-color, #dc3545);
+            }
+          }
+
+          .card-details {
+            .detail-item {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 4px;
+
+              .label {
+                color: var(--text-secondary-color);
+                font-size: 14px;
+                width: 50px;
+                flex-shrink: 0;
+              }
+
+              .value {
+                color: var(--text-color);
+                font-weight: 500;
+                text-align: right;
+              }
+            }
+          }
+
+          .network-stats {
+            .network-item {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+
+              .label {
+                color: var(--text-secondary-color);
+                font-size: 14px;
+              }
+
+              .value {
+                color: var(--text-color);
+                font-weight: 500;
+              }
+            }
+          }
+        }
+
+        .progress-bar {
+          height: 6px;
+          background: var(--border-color);
+          border-radius: 3px;
+          overflow: hidden;
+          margin-top: auto;
+
+          .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+          }
         }
       }
     }

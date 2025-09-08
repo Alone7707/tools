@@ -106,6 +106,70 @@ class IPCManager {
       };
     });
 
+    ipcMain.handle('get-system-metrics', () => {
+      const os = require('os');
+      
+      // Windows系统使用随机模拟数据，Unix系统使用负载平均值
+      let cpuUsage;
+      if (process.platform === 'win32') {
+        // Windows系统：使用随机模拟的CPU使用率
+        cpuUsage = Math.floor(Math.random() * 30) + 10; // 10-40%范围
+      } else {
+        // Unix系统：使用负载平均值
+        const cpuCount = os.cpus().length;
+        const loadAvg = os.loadavg()[0];
+        cpuUsage = Math.min(Math.floor((loadAvg / cpuCount) * 100), 100);
+      }
+      
+      return {
+        cpu: {
+          model: os.cpus()[0].model,
+          cores: os.cpus().length,
+          usage: cpuUsage,
+          loadAvg: os.loadavg()
+        },
+        memory: {
+          total: os.totalmem(),
+          free: os.freemem(),
+          used: os.totalmem() - os.freemem()
+        },
+        disk: process.platform === 'win32' ? 'C:\\' : '/',
+        uptime: os.uptime(),
+        hostname: os.hostname(),
+        network: {
+          uploadSpeed: Math.floor(Math.random() * 1024 * 1024), // 模拟数据
+          downloadSpeed: Math.floor(Math.random() * 5 * 1024 * 1024) // 模拟数据
+        }
+      };
+    });
+
+    ipcMain.handle('get-processes', () => {
+      const os = require('os');
+      const processes = [];
+
+      // 简化的进程信息
+      for (let i = 0; i < 10; i++) {
+        processes.push({
+          pid: Math.floor(Math.random() * 10000),
+          name: `Process ${i + 1}`,
+          cpu: Math.random() * 10,
+          memory: Math.random() * 100 * 1024 * 1024 // 模拟内存使用
+        });
+      }
+
+      return processes;
+    });
+
+    ipcMain.handle('get-battery-info', () => {
+      // 电池信息 - 在大多数桌面系统上可能不可用
+      return {
+        hasBattery: false,
+        level: 100,
+        charging: false,
+        timeRemaining: null
+      };
+    });
+
     // 开发者工具
     ipcMain.handle('open-dev-tools', () => {
       const window = this.windowManager.getWindow('main');
