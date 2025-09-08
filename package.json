@@ -1,6 +1,6 @@
 {
-  "name": "vue-ink-quill",
-  "version": "0.0.0",
+  "name": "Alone-Tools",
+  "version": "1.0.0",
   "private": true,
   "main": "electron/main.js",
   "scripts": {

@@ -189,6 +189,40 @@ const tools = [
       '加解密',
       '支持Base64、Url、MD5、SHA1、SHA256编码/解码',
     ]
+  },
+  {
+    id: 5,
+    routerName: 'TimestampConverter',
+    name: '时间戳转换',
+    description: '时间戳转换工具',
+    icon: '🕒',
+    category: 'development',
+    rating: 5,
+    version: '1.0.0',
+    isNew: true,
+    fullDescription: '时间戳转换工具',
+    features: [
+      '时间戳转换',
+      '支持时间戳到时间的转换',
+      '支持时间到时间戳的转换'
+    ]
+  },
+  {
+    id: 6,
+    routerName: 'CronGenerator',
+    name: 'Cron生成器',
+    description: 'Cron表达式生成器',
+    icon: '🕒',
+    category: 'development',
+    rating: 5,
+    version: '1.0.0',
+    isNew: true,
+    fullDescription: 'Cron表达式生成器',
+    features: [
+      'Cron表达式生成',
+      '支持Cron表达式的生成',
+      '支持Cron表达式的校验'
+    ]
   }
 ]
 

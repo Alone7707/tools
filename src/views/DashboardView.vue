@@ -53,7 +53,7 @@
       <div class="app-info-grid">
         <StatCard title="应用版本" :value="appVersion" />
         <StatCard title="应用名称" :value="appName" />
-        <StatCard title="开发环境" :value="isDev ? '开发模式' : '生产模式'" />
+        <StatCard title="应用环境" :value="isDev ? '开发模式' : '生产模式'" />
       </div>
     </div>
 
@@ -111,7 +111,7 @@ const systemInfo = ref({})
 const recentActivities = ref([])
 const isDev = ref(process.env.NODE_ENV === 'development')
 const appVersion = ref(pkg.version)
-const appName = ref(pkg.productName || 'Electron Tools')
+const appName = ref(pkg.name || 'Electron Tools')
 
 // 获取系统信息
 const fetchSystemInfo = async () => {

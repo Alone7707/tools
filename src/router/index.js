@@ -52,6 +52,16 @@ const routes = [
     component: () => import('../views/tools/EncoderDecoderView.vue')
   },
   {
+    path: '/tools/cron-generator',
+    name: 'CronGenerator',
+    component: () => import('../views/tools/CronGeneratorView.vue')
+  },
+  {
+    path: '/tools/timestamp-converter',
+    name: 'TimestampConverter',
+    component: () => import('../views/tools/TimestampConverterView.vue')
+  },
+  {
     path: '/electron-demo',
     name: 'ElectronDemo',
     component: () => import('../views/demo/ElectronDemoView.vue')
@@ -62,6 +72,7 @@ const routes = [
     component: () => import('../views/demo/LoadingDemoView.vue')
   }
 ]
+
 
 const router = createRouter({
   history: createWebHashHistory(),

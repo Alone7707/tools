@@ -1,6 +1,6 @@
 <template>
   <header class="title-bar">
-    <div class="title">🛠️ Electron Tools</div>
+    <div class="title">🛠️ Alone Tools</div>
     <div class="window-controls">
       <button class="btn-minimize" title="最小化" @click="minimize">
         <img src="@/assets/svg/minimize.svg" width="16" alt="">

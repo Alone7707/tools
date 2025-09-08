@@ -9,7 +9,7 @@ const createContainer = () => {
   const container = document.createElement('div')
   container.setAttribute('id', 'toast-container')
   container.style.position = 'fixed'
-  container.style.top = '20px'
+  container.style.top = '50px'
   container.style.left = '0'
   container.style.width = '100%'
   container.style.height = 'auto'

@@ -3,8 +3,9 @@
     <!-- 菜单头部 -->
     <div class="menu-header" :style="{ 'justify-content': collapsed ? 'center' : 'space-between' }">
       <div v-if="!collapsed" class="menu-title">{{ title }}</div>
-      <BaseButton type="text" :icon="collapsed ? '📖' : '📕'" @click="toggleCollapse" class="collapse-btn"
-        :title="collapsed ? '展开菜单' : '收起菜单'" />
+      <BaseButton type="text" @click="toggleCollapse" class="collapse-btn" :title="collapsed ? '展开菜单' : '收起菜单'">
+        <div class="collapse-icon"></div>
+      </BaseButton>
     </div>
 
     <!-- 菜单内容 -->
@@ -360,6 +361,25 @@ defineExpose({
     padding: 4px;
     min-width: auto;
   }
+
+  .collapse-icon {
+    width: 16px;
+    height: 16px;
+    background-color: var(--icon-color, var(--text-color));
+    mask-image: url('@/assets/svg/fold.svg');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url('@/assets/svg/fold.svg');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    transition: background-color 0.2s ease;
+  }
+
+  .collapse-btn:hover .collapse-icon {
+    background-color: var(--icon-hover-color, var(--primary-color));
+  }
 }
 
 // 菜单内容
@@ -426,6 +446,8 @@ defineExpose({
     margin-right: 12px;
     font-size: 16px;
     flex-shrink: 0;
+    color: var(--icon-color, var(--text-color));
+    transition: color 0.2s ease;
   }
 
   .menu-text {
@@ -548,6 +570,8 @@ defineExpose({
     margin-right: 8px;
     font-size: 14px;
     flex-shrink: 0;
+    color: var(--icon-color, var(--text-secondary-color));
+    transition: color 0.2s ease;
   }
 
   .menu-subtext {
@@ -621,14 +645,16 @@ defineExpose({
     }
 
     .menu-popup-icon {
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 8px;
-      font-size: 14px;
-    }
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    font-size: 14px;
+    color: var(--icon-color, var(--text-color));
+    transition: color 0.2s ease;
+  }
 
     .menu-popup-text {
       flex: 1;
