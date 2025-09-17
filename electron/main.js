@@ -27,6 +27,26 @@ const createWindow = () => {
   // 初始化IPC管理器
   new IPCManager(windowManager);
 
+  // 添加失去焦点时自动隐藏的功能
+  mainWindow.on('blur', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.hide();
+      if (process.platform === 'win32') {
+        mainWindow.setSkipTaskbar(true);
+      }
+    }
+  });
+
+  // 窗口关闭时的处理
+  mainWindow.on('close', (event) => {
+    // 阻止窗口关闭，改为隐藏
+    event.preventDefault();
+    mainWindow.hide();
+    if (process.platform === 'win32') {
+      mainWindow.setSkipTaskbar(true);
+    }
+  });
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL("http://localhost:3004/");
     mainWindow.webContents.openDevTools();
@@ -46,6 +66,9 @@ app.whenReady().then(() => {
 
   // 将updateGlobalShortcut函数添加到全局作用域
   global.updateGlobalShortcut = updateGlobalShortcut;
+
+  // 立即注册默认快捷键
+  registerGlobalShortcut();
 
   // 创建系统托盘
   createTray()
@@ -95,6 +118,9 @@ const updateGlobalShortcut = (newShortcut) => {
               // 显示窗口并置于前台
               window.show();
               window.focus();
+              // 强制获得焦点
+              window.setAlwaysOnTop(true);
+              window.setAlwaysOnTop(false);
               // 在Windows上，确保窗口能够正常显示
               if (process.platform === 'win32') {
                 window.setSkipTaskbar(false);
@@ -122,7 +148,7 @@ const getGlobalShortcut = () => {
     return global.currentGlobalShortcut;
   }
   // 如果没有设置，则使用默认值
-  return 'CommandOrControl+Shift+T';
+  return 'Shift+Space';
 }
 
 // 注册全局快捷键
@@ -152,6 +178,9 @@ const registerGlobalShortcut = (shortcut) => {
         // 显示窗口并置于前台
         window.show();
         window.focus();
+        // 强制获得焦点
+        window.setAlwaysOnTop(true);
+        window.setAlwaysOnTop(false);
         // 在Windows上，确保窗口能够正常显示
         if (process.platform === 'win32') {
           window.setSkipTaskbar(false);
@@ -160,6 +189,19 @@ const registerGlobalShortcut = (shortcut) => {
     } else {
       // 如果窗口不存在，创建一个新窗口
       createWindow();
+      // 延迟显示窗口，确保窗口完全初始化
+      setTimeout(() => {
+        const newWindow = windowManager.getWindow('main');
+        if (newWindow) {
+          newWindow.show();
+          newWindow.focus();
+          newWindow.setAlwaysOnTop(true);
+          newWindow.setAlwaysOnTop(false);
+          if (process.platform === 'win32') {
+            newWindow.setSkipTaskbar(false);
+          }
+        }
+      }, 100);
     }
   })
 
@@ -179,9 +221,6 @@ app.on('will-quit', () => {
 // 创建系统托盘
 const createTray = () => {
   tray = new Tray(path.join(__dirname, '../build/icon.ico'))
-
-  // 获取当前设置的快捷键
-  const currentShortcut = getGlobalShortcut();
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -204,6 +243,9 @@ const createTray = () => {
             // 显示窗口并置于前台
             window.show();
             window.focus();
+            // 强制获得焦点
+            window.setAlwaysOnTop(true);
+            window.setAlwaysOnTop(false);
             // 在Windows上，确保窗口能够正常显示
             if (process.platform === 'win32') {
               window.setSkipTaskbar(false);
@@ -242,6 +284,9 @@ const createTray = () => {
         // 显示窗口并置于前台
         window.show();
         window.focus();
+        // 强制获得焦点
+        window.setAlwaysOnTop(true);
+        window.setAlwaysOnTop(false);
         // 在Windows上，确保窗口能够正常显示
         if (process.platform === 'win32') {
           window.setSkipTaskbar(false);
@@ -251,11 +296,10 @@ const createTray = () => {
   })
 }
 
-// 所有窗口关闭时退出应用（Windows & Linux）
+// 所有窗口关闭时不退出应用，因为窗口只是隐藏了
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  // 不退出应用，保持在后台运行
+  // 应用只能通过托盘菜单的"退出"选项或全局快捷键退出
 })
 
 // 应用激活时显示窗口（macOS）

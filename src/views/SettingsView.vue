@@ -152,7 +152,7 @@ const borderColor = ref(themeStore.themeBorderColor || '#dee2e6')
 const inputBackgroundColor = ref(themeStore.themeInputBackgroundColor || 'white')
 
 // 全局快捷键
-const shortcutKey = ref(themeStore.globalShortcut || 'CommandOrControl+Shift+T')
+const shortcutKey = ref(themeStore.globalShortcut || 'Shift+Space')
 const isRecording = ref(false)
 const pressedKeys = new Set()
 const recordedShortcut = ref('')

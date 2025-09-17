@@ -1,8 +1,14 @@
 <template>
   <div class="timestamp-converter-container">
-    <div class="header">
-      <h1>⏰ 时间戳转换工具</h1>
-      <p class="subtitle">轻松转换时间戳和日期时间格式</p>
+    <!-- 页面标题区域 -->
+    <div class="page-header">
+      <div class="page-title">
+        <div class="title-icon">⏰</div>
+        <div class="title-content">
+          <h1>时间戳转换</h1>
+          <p>时间戳与日期时间互转</p>
+        </div>
+      </div>
     </div>
 
     <div class="converter-grid">
@@ -332,27 +338,46 @@ const clearBatch = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .timestamp-converter-container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: var(--card-background);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 
-.header h1 {
-  font-size: 32px;
-  color: var(--text-color);
-  margin-bottom: 8px;
-}
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 
-.subtitle {
-  font-size: 16px;
-  color: var(--text-secondary-color);
+    .title-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .title-content {
+      h1 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 4px;
+      }
+
+      p {
+        color: var(--text-secondary-color);
+        font-size: 13px;
+        margin: 0;
+      }
+    }
+  }
 }
 
 .converter-grid {

@@ -57,7 +57,7 @@ const routes = [
     component: () => import('../views/tools/CronGeneratorView.vue')
   },
   {
-    path: '/tools/timestamp-converter',
+    path: '/tools/timestamp',
     name: 'TimestampConverter',
     component: () => import('../views/tools/TimestampConverterView.vue')
   },

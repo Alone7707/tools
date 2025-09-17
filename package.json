@@ -51,7 +51,7 @@
   },
   "build": {
     "appId": "com.example.devtools",
-    "productName": "Dev Tools",
+    "productName": "ATools",
     "files": [
       "electron/**/*",
       "dist/**/*",
@@ -74,7 +74,7 @@
       "installerHeaderIcon": "build/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Dev Tools",
+      "shortcutName": "ATools",
       "deleteAppDataOnUninstall": true
     },
     "mac": {

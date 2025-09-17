@@ -15,11 +15,12 @@ export const useGlobalStore = defineStore('global', () => {
   const themeInputBackgroundColor = ref('');
 
   // 全局快捷键
-  const globalShortcut = ref('CommandOrControl+Shift+T');
+  const globalShortcut = ref('Shift+Space');
 
   // 初始化全局快捷键
   const initGlobalShortcut = () => {
     const savedGlobalShortcut = localStorage.getItem('globalShortcut');
+    console.log("🚀 ~ initGlobalShortcut ~ savedGlobalShortcut:", savedGlobalShortcut)
     if (savedGlobalShortcut) {
       globalShortcut.value = savedGlobalShortcut;
     }
@@ -75,8 +76,8 @@ export const useGlobalStore = defineStore('global', () => {
     if (theme === 'dark') {
       isDark.value = true
       isCustomTheme.value = false
-      themePrimaryColor.value = '#667eea'
-      themeSecondaryColor.value = '#764ba2'
+      // themePrimaryColor.value = '#667eea'
+      // themeSecondaryColor.value = '#764ba2'
       themeBackgroundColor.value = '#1a1a1a'
       themeCardBackgroundColor.value = '#2d2d2d'
       themeTextColor.value = '#fff'
@@ -86,8 +87,8 @@ export const useGlobalStore = defineStore('global', () => {
     } else if (theme === 'light') {
       isDark.value = false
       isCustomTheme.value = false
-      themePrimaryColor.value = '#764ba2'
-      themeSecondaryColor.value = '#667eea'
+      // themePrimaryColor.value = '#764ba2'
+      // themeSecondaryColor.value = '#667eea'
       themeBackgroundColor.value = '#f8f9fa'
       themeCardBackgroundColor.value = 'white'
       themeTextColor.value = '#333'

@@ -1,170 +1,71 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard-header">
-      <div class="header-content">
-        <h1>欢迎使用 Electron Tools</h1>
-        <p>现代化的桌面应用工具集，提升您的工作效率</p>
+    <div class="welcome-section">
+      <div class="welcome-card">
+        <div class="welcome-icon">⚡</div>
+        <div class="welcome-content">
+          <h2>小工具集</h2>
+          <p>快速、轻量的桌面工具</p>
       </div>
-      <div class="header-actions">
-        <button class="action-btn" @click="fetchSystemInfo">
-          <span class="icon">🔄</span> 刷新数据
-        </button>
       </div>
     </div>
 
-    <!-- 系统监控卡片 -->
-    <div class="section">
-      <h2>系统监控</h2>
-      <div class="system-monitor-grid">
-        <div class="monitor-card cpu-card">
-          <div class="card-header">
-            <h3>CPU使用率</h3>
-            <span class="card-icon">🖥️</span>
-          </div>
-          <div class="card-content">
-            <div class="big-number" :class="getCpuClass()">
-              {{ systemMetrics.cpu.usage }}%
-            </div>
-            <div class="card-details">
-              <div class="detail-item">
-                <span class="label">核心数:</span>
-                <span class="value">{{ systemMetrics.cpu.cores || 0 }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">型号:</span>
-                <span class="value">{{ systemMetrics.cpu.model || '未知' }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: systemMetrics.cpu.usage + '%' }"></div>
-          </div>
-        </div>
-
-        <div class="monitor-card memory-card">
-          <div class="card-header">
-            <h3>内存使用</h3>
-            <span class="card-icon">🧠</span>
-          </div>
-          <div class="card-content">
-            <div class="big-number" :class="getMemoryClass()">
-              {{ systemMetrics.memory.usage }}%
-            </div>
-            <div class="card-details">
-              <div class="detail-item">
-                <span class="label">已用:</span>
-                <span class="value">{{ formatBytes(systemMetrics.memory.used) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">总计:</span>
-                <span class="value">{{ formatBytes(systemMetrics.memory.total) }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: systemMetrics.memory.usage + '%' }"></div>
-          </div>
-        </div>
-
-        <div class="monitor-card network-card">
-          <div class="card-header">
-            <h3>网络状态</h3>
-            <span class="card-icon">🌐</span>
-          </div>
-          <div class="card-content">
-            <div class="network-stats">
-              <div class="network-item">
-                <span class="label">▲ 上传:</span>
-                <span class="value">{{ formatBytes(systemMetrics.network.uploadSpeed) }}/s</span>
-              </div>
-              <div class="network-item">
-                <span class="label">▼ 下载:</span>
-                <span class="value">{{ formatBytes(systemMetrics.network.downloadSpeed) }}/s</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- 快捷工具 -->
+    <div class="quick-tools">
+      <h3>快捷工具</h3>
+      <div class="tools-grid">
+        <router-link to="/tools/timestamp" class="tool-card">
+          <div class="tool-icon">🕒</div>
+          <span>时间戳转换</span>
+        </router-link>
+        <router-link to="/tools/encoder-decoder" class="tool-card">
+          <div class="tool-icon">🔐</div>
+          <span>编码解码</span>
+        </router-link>
+        <router-link to="/tools/json-formatter" class="tool-card">
+          <div class="tool-icon">📄</div>
+          <span>JSON格式化</span>
+        </router-link>
+        <router-link to="/tools/cron-generator" class="tool-card">
+          <div class="tool-icon">⏰</div>
+          <span>Cron表达式</span>
+        </router-link>
       </div>
     </div>
 
-    <!-- 系统信息卡片 -->
-    <div class="section">
-      <h2>系统信息</h2>
-      <div class="system-info-grid">
+    <!-- 系统信息 -->
+    <div class="system-info">
+      <h3>系统状态</h3>
+      <div class="info-grid">
         <div class="info-card">
           <div class="info-icon">🖥️</div>
           <div class="info-content">
-            <h3>平台</h3>
-            <p>{{ systemInfo.platform || '加载中...' }}</p>
+            <div class="info-value">{{ systemMetrics.cpu.usage }}%</div>
+            <div class="info-label">CPU使用率</div>
           </div>
         </div>
-        <div class="info-card">
-          <div class="info-icon">🔧</div>
-          <div class="info-content">
-            <h3>架构</h3>
-            <p>{{ systemInfo.arch || '加载中...' }}</p>
-          </div>
-        </div>
-        <div class="info-card">
-          <div class="info-icon">⚡</div>
-          <div class="info-content">
-            <h3>Electron</h3>
-            <p>{{ systemInfo.electron || '加载中...' }}</p>
-          </div>
-        </div>
-        <div class="info-card">
-          <div class="info-icon">🟢</div>
-          <div class="info-content">
-            <h3>Node.js</h3>
-            <p>{{ systemInfo.node || '加载中...' }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 应用信息 -->
-    <div class="section">
-      <h2>应用信息</h2>
-      <div class="app-info-grid">
-        <StatCard title="应用版本" :value="appVersion" />
-        <StatCard title="应用名称" :value="appName" />
-        <StatCard title="应用环境" :value="isDev ? '开发模式' : '生产模式'" />
-      </div>
-    </div>
-
-    <!-- 功能导航 -->
-    <div class="section">
-      <h2>功能导航</h2>
-      <div class="feature-grid">
-        <router-link to="/settings" class="feature-card">
-          <div class="feature-icon">⚙️</div>
-          <h3>系统设置</h3>
-          <p>配置应用偏好和主题</p>
-        </router-link>
-        <div class="feature-card" @click="openFileExplorer">
-          <div class="feature-icon">📁</div>
-          <h3>文件管理</h3>
-          <p>浏览和管理本地文件</p>
+        <div class="info-card">
+          <div class="info-icon">🧠</div>
+          <div class="info-content">
+            <div class="info-value">{{ systemMetrics.memory.usagePercent }}%</div>
+            <div class="info-label">内存使用</div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 最近活动 -->
-    <div class="section">
-      <div class="section-header">
-        <h2>最近活动</h2>
-        <button class="text-btn" @click="clearActivity">清除</button>
-      </div>
-      <div class="activity-list">
-        <div v-if="recentActivities.length === 0" class="empty-state">
-          <p>暂无活动记录</p>
+        <div class="info-card">
+          <div class="info-icon">📡</div>
+          <div class="info-content">
+            <div class="info-value">{{ formatNetworkSpeed(systemMetrics.network.uploadSpeed) }}</div>
+            <div class="info-label">上传速度</div>
+          </div>
         </div>
-        <div v-else v-for="(activity, index) in recentActivities" :key="index" class="activity-item">
-          <div class="activity-icon">{{ activity.icon }}</div>
-          <div class="activity-content">
-            <h4>{{ activity.title }}</h4>
-            <p>{{ activity.description }}</p>
-            <span class="activity-time">{{ formatTime(activity.timestamp) }}</span>
+
+        <div class="info-card">
+          <div class="info-icon">📥</div>
+          <div class="info-content">
+            <div class="info-value">{{ formatNetworkSpeed(systemMetrics.network.downloadSpeed) }}</div>
+            <div class="info-label">下载速度</div>
           </div>
         </div>
       </div>
@@ -173,503 +74,248 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import StatCard from '../components/StatCard.vue'
-import pkg from '../../package.json'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const systemInfo = ref({})
+// 系统指标数据
 const systemMetrics = ref({
-  cpu: { usage: 0, cores: 0, model: '' },
-  memory: { usage: 0, used: 0, total: 0 },
-  network: { uploadSpeed: 0, downloadSpeed: 0 }
-})
-const recentActivities = ref([])
-const isDev = ref(process.env.NODE_ENV === 'development')
-const appVersion = ref(pkg.version)
-const appName = ref(pkg.name || 'Electron Tools')
-
-// 获取系统信息
-const fetchSystemInfo = async () => {
-  if (window.electronAPI) {
-    try {
-      systemInfo.value = await window.electronAPI.getSystemInfo()
-    } catch (error) {
-      console.error('获取系统信息失败:', error)
-    }
-  }
-}
-
-// 获取系统监控数据
-const fetchSystemMetrics = async () => {
-  try {
-    const metrics = await window.electronAPI.getSystemMetrics()
-
-    // 计算使用率并确保数据完整
-    const memoryUsage = metrics.memory.total > 0 ?
-      Math.round((metrics.memory.used / metrics.memory.total) * 100) : 0;
-
-    systemMetrics.value = {
       cpu: {
-        usage: metrics.cpu.usage || 0,
-        cores: metrics.cpu.cores || 4,
-        model: metrics.cpu.model || '未知'
+    usage: 0,
+    cores: 0,
+    model: ''
       },
       memory: {
-        usage: memoryUsage,
-        used: metrics.memory.used || 0,
-        total: metrics.memory.total || 0
+    total: 0,
+    used: 0,
+    usagePercent: 0
       },
       network: {
-        uploadSpeed: metrics.network?.uploadSpeed || 0,
-        downloadSpeed: metrics.network?.downloadSpeed || 0
-      }
-    }
-  } catch (error) {
-    console.error('获取系统监控数据失败:', error)
+    uploadSpeed: 0,
+    downloadSpeed: 0
   }
-}
+})
 
-// 格式化字节
+// 定时器变量
+let interval = null
+
+// 格式化字节数
 const formatBytes = (bytes) => {
   if (bytes === 0) return '0 B'
   const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-// 获取CSS类名
-const getCpuClass = () => {
-  const usage = systemMetrics.value.cpu.usage
-  if (usage > 80) return 'critical'
-  if (usage > 60) return 'warning'
-  return 'normal'
+// 格式化网络速度
+const formatNetworkSpeed = (bytesPerSecond) => {
+  if (bytesPerSecond === 0) return '0 B/s'
+  const k = 1024
+  const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s']
+  const i = Math.floor(Math.log(bytesPerSecond) / Math.log(k))
+  return parseFloat((bytesPerSecond / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
-const getMemoryClass = () => {
-  const usage = systemMetrics.value.memory.usage
-  if (usage > 90) return 'critical'
-  if (usage > 70) return 'warning'
-  return 'normal'
-}
+// 获取系统信息
+const fetchSystemInfo = async () => {
+  try {
+    // 尝试获取真实的系统信息
+    if (window.electronAPI && window.electronAPI.getSystemMetrics) {
+      const info = await window.electronAPI.getSystemMetrics()
 
-// 添加活动记录
-const addActivity = (title, description, icon = '📝') => {
-  recentActivities.value.unshift({
-    title,
-    description,
-    icon,
-    timestamp: new Date()
-  })
+      // 直接使用后端计算的网络速度
+      const uploadSpeed = info.network?.uploadSpeed || 0
+      const downloadSpeed = info.network?.downloadSpeed || 0
 
-  // 限制活动记录数量
-  if (recentActivities.value.length > 5) {
-    recentActivities.value = recentActivities.value.slice(0, 5)
+      systemMetrics.value = {
+        cpu: {
+          usage: Math.round(info.cpu?.usage || 0),
+          cores: info.cpu?.cores || 0,
+          model: info.cpu?.model || '未知'
+        },
+        memory: {
+          total: info.memory?.total || 0,
+          used: info.memory?.used || 0,
+          usagePercent: Math.round(((info.memory?.used || 0) / (info.memory?.total || 1)) * 100)
+        },
+        network: {
+          uploadSpeed,
+          downloadSpeed
+        }
+      }
+    } else {
+      // 如果没有 electronAPI，使用模拟数据
+      generateMockData()
+    }
+  } catch (error) {
+    console.error('获取系统信息失败:', error)
+    // 出错时使用模拟数据
+    generateMockData()
   }
 }
 
-// 清除活动记录
-const clearActivity = () => {
-  recentActivities.value = []
-}
-
-// 打开文件浏览器
-const openFileExplorer = async () => {
-  if (window.electronAPI) {
-    try {
-      const result = await window.electronAPI.selectFile()
-      if (result.success) {
-        addActivity('文件', `已选择文件: ${result.filePath}`, '📁')
-      }
-    } catch (error) {
-      console.error('打开文件浏览器失败:', error)
-      addActivity('错误', '打开文件浏览器失败', '❌')
+// 生成模拟数据（用于开发和测试）
+const generateMockData = () => {
+  systemMetrics.value = {
+    cpu: {
+      usage: Math.round(Math.random() * 30 + 10), // 10-40% 随机CPU使用率
+      cores: 8,
+      model: 'Intel Core i7'
+    },
+    memory: {
+      total: 16 * 1024 * 1024 * 1024, // 16GB
+      used: Math.round(Math.random() * 8 * 1024 * 1024 * 1024 + 4 * 1024 * 1024 * 1024), // 4-12GB
+      usagePercent: Math.round(Math.random() * 50 + 25) // 25-75%
+    },
+    network: {
+      uploadSpeed: Math.random() * 1024 * 1024, // 0-1MB/s
+      downloadSpeed: Math.random() * 5 * 1024 * 1024 // 0-5MB/s
     }
   }
 }
 
-// 格式化时间
-const formatTime = (timestamp) => {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diffMs = now - date
-  const diffMins = Math.floor(diffMs / 60000)
+onMounted(() => {
+  fetchSystemInfo()
+  // 每2秒更新一次系统指标，让变化更明显
+  interval = setInterval(() => {
+    fetchSystemInfo()
+  }, 2000)
+})
 
-  if (diffMins < 1) return '刚刚'
-  if (diffMins < 60) return `${diffMins}分钟前`
-
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}小时前`
-
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}天前`
-}
-
-onMounted(async () => {
-  await fetchSystemInfo()
-  await fetchSystemMetrics()
-
-  // 每5秒自动刷新监控数据
-  setInterval(() => {
-    fetchSystemMetrics()
-  }, 5000)
+onUnmounted(() => {
+  if (interval) {
+    clearInterval(interval)
+  }
 })
 </script>
 
 <style lang="scss" scoped>
 .dashboard {
-  padding: 20px;
-  background: var(--background-color);
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 
-  .dashboard-header {
+  .welcome-section {
+    margin-bottom: 12px;
+
+    .welcome-card {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+      gap: 16px;
+      padding: 20px 24px;
+      background: var(--card-background);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
 
-    .header-content {
-      h1 {
-        color: var(--text-color);
-        margin-bottom: 8px;
-        font-size: 28px;
+      .welcome-icon {
+        font-size: 32px;
+        flex-shrink: 0;
       }
 
-      p {
-        color: var(--text-secondary-color);
-        font-size: 16px;
-      }
-    }
+      .welcome-content {
+        flex: 1;
 
-    .header-actions {
-      .action-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: var(--secondary-color);
-          transform: translateY(-2px);
+        h2 {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text-color);
+          margin-bottom: 4px;
         }
 
-        .icon {
-          font-size: 16px;
+        p {
+          color: var(--text-secondary-color);
+          font-size: 13px;
+          margin: 0;
         }
       }
     }
   }
 
-  .section {
-    margin-bottom: 30px;
+  .quick-tools {
+    margin-bottom: 16px;
 
-    h2 {
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
       color: var(--text-color);
-      margin-bottom: 20px;
-      font-size: 20px;
+      margin-bottom: 16px;
     }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-
-      .text-btn {
-        background: none;
-        border: none;
-        color: var(--primary-color);
-        cursor: pointer;
-        font-size: 14px;
-        padding: 5px 0;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .system-monitor-grid {
+    .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
 
-      .monitor-card {
-        min-height: 220px;
-        background: var(--card-background);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 20px;
-        transition: all 0.2s ease;
+      .tool-card {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        padding: 20px 16px;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-color);
+        transition: all 0.2s ease;
 
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-color: var(--primary-color);
         }
 
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-
-          h3 {
-            margin: 0;
-            color: var(--text-color);
-            font-size: 16px;
-          }
-
-          .card-icon {
-            font-size: 24px;
-          }
+        .tool-icon {
+          font-size: 28px;
+          margin-bottom: 8px;
         }
 
-        .card-content {
-          .big-number {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 12px;
-
-            &.normal {
-              color: var(--success-color, #28a745);
-            }
-
-            &.warning {
-              color: var(--warning-color, #ffc107);
-            }
-
-            &.critical {
-              color: var(--danger-color, #dc3545);
-            }
-          }
-
-          .card-details {
-            .detail-item {
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 4px;
-
-              .label {
-                color: var(--text-secondary-color);
-                font-size: 14px;
-                width: 50px;
-                flex-shrink: 0;
-              }
-
-              .value {
-                color: var(--text-color);
-                font-weight: 500;
-                text-align: right;
-              }
-            }
-          }
-
-          .network-stats {
-            .network-item {
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 8px;
-
-              .label {
-                color: var(--text-secondary-color);
-                font-size: 14px;
-              }
-
-              .value {
-                color: var(--text-color);
+        span {
+          font-size: 12px;
+          text-align: center;
                 font-weight: 500;
               }
             }
           }
         }
 
-        .progress-bar {
-          height: 6px;
-          background: var(--border-color);
-          border-radius: 3px;
-          overflow: hidden;
-          margin-top: auto;
-
-          .progress-fill {
-            height: 100%;
-            background: var(--primary-color);
-            transition: width 0.3s ease;
-          }
-        }
-      }
+  .system-info {
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 16px;
     }
 
-    .system-info-grid {
+    .info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
 
       .info-card {
-        background: var(--card-background);
-        border-radius: 8px;
-        padding: 16px;
-        border: 1px solid var(--border-color);
         display: flex;
         align-items: center;
+        padding: 16px;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
         gap: 12px;
-        transition: all 0.2s ease;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
 
         .info-icon {
           font-size: 24px;
         }
 
         .info-content {
-          h3 {
-            margin: 0 0 4px 0;
-            color: var(--text-secondary-color);
-            font-size: 14px;
-            font-weight: normal;
-          }
-
-          p {
-            margin: 0;
-            color: var(--text-color);
-            font-size: 16px;
-            font-weight: bold;
-          }
-        }
-      }
-    }
-
-    .app-info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-
-      .feature-card {
-        background: var(--card-background);
-        border-radius: 8px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        color: var(--text-color);
-
-        &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-          border-color: var(--primary-color);
-        }
-
-        .feature-icon {
-          font-size: 32px;
-          margin-bottom: 12px;
-        }
-
-        h3 {
-          margin: 0 0 8px 0;
+          .info-value {
           font-size: 18px;
-        }
-
-        p {
-          margin: 0;
-          color: var(--text-secondary-color);
-          font-size: 14px;
-        }
-      }
-    }
-
-    .activity-list {
-      background: var(--card-background);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      overflow: hidden;
-
-      .empty-state {
-        padding: 30px;
-        text-align: center;
-        color: var(--text-secondary-color);
-      }
-
-      .activity-item {
-        display: flex;
-        gap: 16px;
-        padding: 16px;
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          background: rgba(var(--primary-color-rgb), 0.05);
-        }
-
-        .activity-icon {
-          font-size: 20px;
-          flex-shrink: 0;
-        }
-
-        .activity-content {
-          flex: 1;
-
-          h4 {
-            margin: 0 0 4px 0;
+            font-weight: 600;
             color: var(--text-color);
-            font-size: 16px;
+            line-height: 1.2;
           }
 
-          p {
-            margin: 0 0 8px 0;
+          .info-label {
+            font-size: 11px;
             color: var(--text-secondary-color);
-            font-size: 14px;
-          }
-
-          .activity-time {
-            font-size: 12px;
-            color: var(--text-secondary-color);
+            margin-top: 2px;
           }
         }
-      }
-    }
-  }
-}
-
-// 响应式设计
-@media (max-width: 768px) {
-  .dashboard {
-    .dashboard-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .section {
-
-      .system-info-grid,
-      .app-info-grid,
-      .feature-grid {
-        grid-template-columns: 1fr;
       }
     }
   }

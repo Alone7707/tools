@@ -28,13 +28,13 @@ const globalStore = useGlobalStore()
 onMounted(() => {
   globalStore.initTheme()
   globalStore.initGlobalShortcut()
-  
+
   // 监听主进程请求获取保存的快捷键
   if (window.electronAPI && window.electronAPI.onGetSavedShortcut) {
     window.electronAPI.onGetSavedShortcut(() => {
       // 从localStorage获取保存的快捷键
-      const savedShortcut = localStorage.getItem('globalShortcut') || 'CommandOrControl+Shift+T';
-      
+      const savedShortcut = localStorage.getItem('globalShortcut') || 'Shift+Space';
+
       // 发送保存的快捷键到主进程
       if (window.electronAPI && window.electronAPI.sendSavedShortcut) {
         window.electronAPI.sendSavedShortcut(savedShortcut);
@@ -65,40 +65,40 @@ watch(() => [globalStore.themePrimaryColor, globalStore.themeSecondaryColor, glo
   if (primary && secondary) {
     document.documentElement.style.setProperty('--primary-color', primary)
     document.documentElement.style.setProperty('--secondary-color', secondary)
-    
+
     // 更新 RGB 值
     const primaryRgb = hexToRgb(primary)
     const secondaryRgb = hexToRgb(secondary)
-    
+
     if (primaryRgb) {
       document.documentElement.style.setProperty('--primary-color-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
     }
-    
+
     if (secondaryRgb) {
       document.documentElement.style.setProperty('--secondary-color-rgb', `${secondaryRgb.r}, ${secondaryRgb.g}, ${secondaryRgb.b}`)
     }
   }
-  
+
   if (background) {
     document.documentElement.style.setProperty('--background-color', background)
   }
-  
+
   if (cardBackground) {
     document.documentElement.style.setProperty('--card-background', cardBackground)
   }
-  
+
   if (textColor) {
     document.documentElement.style.setProperty('--text-color', textColor)
   }
-  
+
   if (textSecondaryColor) {
     document.documentElement.style.setProperty('--text-secondary', textSecondaryColor)
   }
-  
+
   if (borderColor) {
     document.documentElement.style.setProperty('--border-color', borderColor)
   }
-  
+
   if (inputBackgroundColor) {
     document.documentElement.style.setProperty('--input-background', inputBackgroundColor)
   }
@@ -108,15 +108,15 @@ watch(() => [globalStore.themePrimaryColor, globalStore.themeSecondaryColor, glo
 const hexToRgb = (hex) => {
   // 移除 # 符号
   hex = hex.replace(/^#/, '')
-  
+
   // 处理简写形式，如 #03f -> #0033ff
   if (hex.length === 3) {
     hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
   }
-  
+
   // 解析十六进制值
   const num = parseInt(hex, 16)
-  
+
   // 提取 RGB 分量
   return {
     r: (num >> 16) & 255,
@@ -146,12 +146,14 @@ body {
     .main-container {
       display: flex;
       flex: 1;
-      height: calc(100vh - 50px);
+      height: calc(100vh - 38px);
+      /* 调整为新的标题栏高度 */
 
       .content {
         flex: 1;
         overflow-y: auto;
         background: var(--background-color);
+        padding: 16px;
       }
     }
   }

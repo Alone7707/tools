@@ -108,22 +108,49 @@ class IPCManager {
 
     ipcMain.handle('get-system-metrics', () => {
       const os = require('os');
-      
-      // Windows系统使用随机模拟数据，Unix系统使用负载平均值
+
+      // 生成动态的CPU使用率（模拟真实变化）
       let cpuUsage;
       if (process.platform === 'win32') {
-        // Windows系统：使用随机模拟的CPU使用率
-        cpuUsage = Math.floor(Math.random() * 30) + 10; // 10-40%范围
+        // Windows系统：使用随机模拟的CPU使用率，但保持一定的连续性
+        if (!this.lastCpuUsage) {
+          this.lastCpuUsage = Math.floor(Math.random() * 30) + 20; // 初始值 20-50%
+        }
+        // 在上次基础上小幅变化
+        const change = (Math.random() - 0.5) * 10; // -5 到 +5 的变化
+        this.lastCpuUsage = Math.max(5, Math.min(95, this.lastCpuUsage + change));
+        cpuUsage = Math.round(this.lastCpuUsage);
       } else {
         // Unix系统：使用负载平均值
         const cpuCount = os.cpus().length;
         const loadAvg = os.loadavg()[0];
         cpuUsage = Math.min(Math.floor((loadAvg / cpuCount) * 100), 100);
       }
-      
+
+      // 生成动态的网络速度
+      if (!this.lastNetworkStats) {
+        this.lastNetworkStats = {
+          uploadSpeed: Math.random() * 1024 * 1024, // 0-1MB/s
+          downloadSpeed: Math.random() * 5 * 1024 * 1024, // 0-5MB/s
+          tx_bytes: Math.floor(Math.random() * 1000000000), // 初始发送字节数
+          rx_bytes: Math.floor(Math.random() * 1000000000)  // 初始接收字节数
+        };
+      } else {
+        // 模拟网络活动
+        const uploadChange = Math.random() * 512 * 1024; // 0-512KB/s 变化
+        const downloadChange = Math.random() * 2 * 1024 * 1024; // 0-2MB/s 变化
+
+        this.lastNetworkStats.uploadSpeed = Math.max(0, this.lastNetworkStats.uploadSpeed + (Math.random() - 0.5) * uploadChange);
+        this.lastNetworkStats.downloadSpeed = Math.max(0, this.lastNetworkStats.downloadSpeed + (Math.random() - 0.5) * downloadChange);
+
+        // 累积字节数
+        this.lastNetworkStats.tx_bytes += Math.floor(this.lastNetworkStats.uploadSpeed * 2); // 假设2秒间隔
+        this.lastNetworkStats.rx_bytes += Math.floor(this.lastNetworkStats.downloadSpeed * 2);
+      }
+
       return {
         cpu: {
-          model: os.cpus()[0].model,
+          model: os.cpus()[0]?.model || 'Unknown CPU',
           cores: os.cpus().length,
           usage: cpuUsage,
           loadAvg: os.loadavg()
@@ -137,8 +164,10 @@ class IPCManager {
         uptime: os.uptime(),
         hostname: os.hostname(),
         network: {
-          uploadSpeed: Math.floor(Math.random() * 1024 * 1024), // 模拟数据
-          downloadSpeed: Math.floor(Math.random() * 5 * 1024 * 1024) // 模拟数据
+          uploadSpeed: Math.round(this.lastNetworkStats.uploadSpeed),
+          downloadSpeed: Math.round(this.lastNetworkStats.downloadSpeed),
+          tx_bytes: this.lastNetworkStats.tx_bytes,
+          rx_bytes: this.lastNetworkStats.rx_bytes
         }
       };
     });

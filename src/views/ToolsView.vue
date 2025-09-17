@@ -1,18 +1,19 @@
 <template>
   <div class="tools-view">
-    <div class="tools-header">
-      <div class="header-content">
-        <h1>工具列表</h1>
-        <p>探索和使用各种实用工具，提升您的工作效率</p>
+    <!-- 页面标题区域 -->
+    <div class="page-header">
+      <div class="page-title">
+        <div class="title-icon">🔧</div>
+        <div class="title-content">
+          <h1>工具箱</h1>
+          <p>实用工具集合</p>
+        </div>
       </div>
-      <div class="header-actions">
+      <div class="page-actions">
         <div class="search-box">
           <input type="text" v-model="searchQuery" placeholder="搜索工具..." class="search-input" />
           <span class="search-icon">🔍</span>
         </div>
-        <button class="action-btn" @click="refreshTools">
-          <span class="icon">🔄</span> 刷新
-        </button>
       </div>
     </div>
 
@@ -304,51 +305,57 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .tools-view {
-  padding: 20px;
-  background: var(--background-color);
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 
-  .tools-header {
+  .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+    padding: 20px 24px;
+    background: var(--card-background);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 
-    .header-content {
-      h1 {
-        color: var(--text-color);
-        margin-bottom: 8px;
-        font-size: 28px;
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .title-icon {
+        font-size: 32px;
+        flex-shrink: 0;
       }
 
-      p {
-        color: var(--text-secondary-color);
-        font-size: 16px;
+      .title-content {
+        h1 {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text-color);
+          margin-bottom: 4px;
+        }
+
+        p {
+          color: var(--text-secondary-color);
+          font-size: 13px;
+          margin: 0;
+        }
       }
     }
 
-    .header-actions {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-
+    .page-actions {
       .search-box {
         position: relative;
 
         .search-input {
-          padding: 10px 16px 10px 40px;
+          padding: 8px 12px 8px 32px;
           border: 1px solid var(--border-color);
           border-radius: 6px;
-          background: var(--card-background);
+          background: var(--input-background);
           color: var(--text-color);
-          width: 250px;
-          font-size: 14px;
+          width: 200px;
+          font-size: 13px;
           transition: all 0.2s ease;
 
           &:focus {
@@ -360,33 +367,11 @@ onMounted(() => {
 
         .search-icon {
           position: absolute;
-          left: 12px;
+          left: 10px;
           top: 50%;
           transform: translateY(-50%);
           color: var(--text-secondary-color);
-        }
-      }
-
-      .action-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: var(--secondary-color);
-          transform: translateY(-2px);
-        }
-
-        .icon {
-          font-size: 16px;
+          font-size: 14px;
         }
       }
     }
@@ -394,32 +379,36 @@ onMounted(() => {
 
   .categories {
     display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
+    gap: 8px;
+    margin-bottom: 10px;
     overflow-x: auto;
-    padding: 10px 0;
+    // padding: 8px 0;
 
     .category-btn {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 16px;
+      padding: 6px 12px;
       background: var(--card-background);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      font-size: 14px;
-      color: var(--text-color);
+      border-radius: 16px;
+      font-size: 12px;
+      color: var(--text-secondary-color);
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s ease;
 
+      .category-icon {
+        font-size: 14px;
+      }
+
       &:hover {
-        border-color: var(--primary-color);
-        transform: translateY(-2px);
+        background: var(--border-color);
+        color: var(--text-color);
       }
 
       &.active {
-        background: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
         border-color: var(--primary-color);
       }
@@ -434,6 +423,7 @@ onMounted(() => {
     height: 100%;
     overflow: hidden;
     overflow-y: auto;
+    padding: 4px 0;
 
     .empty-state {
       display: flex;
@@ -461,23 +451,22 @@ onMounted(() => {
 
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
 
       .tool-card {
         background: var(--card-background);
         border-radius: 8px;
         border: 1px solid var(--border-color);
-        margin: 6px;
-        padding: 20px;
+        padding: 16px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         flex-direction: column;
 
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-medium);
           border-color: var(--primary-color);
         }
 

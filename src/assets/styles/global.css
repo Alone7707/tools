@@ -1,28 +1,33 @@
-/* 全局样式 */
+/* 小工具风格的全局样式 */
 :root {
-  --primary-color: #764ba2;
-  --secondary-color: #667eea;
-  --background-color: #f8f9fa;
-  --text-color: #333;
-  --text-secondary-color: #666;
-  --border-color: #dee2e6;
-  --card-background: white;
-  --input-background: white;
-  --primary-color-rgb: 118, 75, 162;
-  --secondary-color-rgb: 102, 126, 234;
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --background-color: #f5f6fa;
+  --text-color: #2c3e50;
+  --text-secondary-color: #7f8c8d;
+  --border-color: #e1e8ed;
+  --card-background: #ffffff;
+  --input-background: #ffffff;
+  --primary-color-rgb: 102, 126, 234;
+  --secondary-color-rgb: 118, 75, 162;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
 }
 
 .dark {
   --primary-color: #667eea;
   --secondary-color: #764ba2;
-  --background-color: #1a1a1a;
-  --text-color: #fff;
-  --text-secondary-color: #ccc;
-  --border-color: #333;
-  --card-background: #2d2d2d;
-  --input-background: #3d3d3d;
+  --background-color: #1e1e2e;
+  --text-color: #f8f8f2;
+  --text-secondary-color: #a6a6a6;
+  --border-color: #313244;
+  --card-background: #2a2a3a;
+  --input-background: #313244;
   --primary-color-rgb: 102, 126, 234;
   --secondary-color-rgb: 118, 75, 162;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .custom-theme {
@@ -54,20 +59,30 @@ button {
   font-family: inherit;
 }
 
-/* 滚动条样式 */
+/* 现代化滚动条样式 */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: var(--border-color);
+  border-radius: 3px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--text-secondary-color);
+}
+
+/* 暗色主题下的滚动条 */
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary-color);
 }
