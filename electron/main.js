@@ -4,6 +4,7 @@ const IPCManager = require('./ipc/index.js');
 const path = require('path');
 
 let tray = null;
+let isQuitting = false;
 
 // 窗口管理器
 const windowManager = {
@@ -39,11 +40,13 @@ const createWindow = () => {
 
   // 窗口关闭时的处理
   mainWindow.on('close', (event) => {
-    // 阻止窗口关闭，改为隐藏
-    event.preventDefault();
-    mainWindow.hide();
-    if (process.platform === 'win32') {
-      mainWindow.setSkipTaskbar(true);
+    // 如果不是真正退出，则阻止窗口关闭，改为隐藏
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+      if (process.platform === 'win32') {
+        mainWindow.setSkipTaskbar(true);
+      }
     }
   });
 
@@ -257,6 +260,7 @@ const createTray = () => {
     {
       label: '退出',
       click: () => {
+        isQuitting = true;
         app.quit();
       }
     }

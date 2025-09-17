@@ -9,10 +9,11 @@ import nlsPlugin, {
 } from "./public/I18n/vite-plugin-i18n-nls";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
-    vueDevTools(),
+    // 只在开发环境启用开发工具
+    ...(mode === 'development' ? [vueDevTools()] : []),
     // 生产环境汉化
     nlsPlugin({
       locale: Languages.zh_hans,
@@ -42,6 +43,8 @@ export default defineConfig({
   },
   base: './',  // 使用相对路径，解决 Electron 打包后的资源加载问题
   build: {
+    sourcemap: mode === 'development',
+    minify: mode === 'production' ? 'terser' : false,
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
@@ -49,8 +52,46 @@ export default defineConfig({
         // 确保资源文件使用相对路径
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]'
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        // 只在生产环境进行代码分包优化
+        ...(mode === 'production' && {
+          manualChunks: {
+            'monaco-editor': ['monaco-editor'],
+            'highlight': ['highlight.js'],
+            'marked': ['marked'],
+            'vue-vendor': ['vue', 'vue-router', 'pinia']
+          }
+        })
       }
-    }
+    },
+    // 只在生产环境应用 terser 配置
+    ...(mode === 'production' && {
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log', 'console.warn', 'console.info'],
+          collapse_vars: true,
+          reduce_vars: true,
+        },
+        mangle: {
+          toplevel: true,
+          keep_classnames: false,
+          keep_fnames: false,
+        },
+        output: {
+          comments: false,
+          beautify: false,
+          ascii_only: true,
+        },
+      },
+      chunkSizeWarningLimit: 1000,
+      assetsInlineLimit: 4096
+    })
   },
-})
+  // 只在生产环境禁用 Vue 开发工具
+  define: {
+    __VUE_PROD_DEVTOOLS__: mode === 'development',
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: mode === 'development'
+  }
+}))
