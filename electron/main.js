@@ -135,6 +135,7 @@ const updateGlobalShortcut = (newShortcut) => {
       {
         label: '退出',
         click: () => {
+          isQuitting = true;
           app.quit();
         }
       }

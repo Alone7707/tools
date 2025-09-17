@@ -57,8 +57,6 @@ export default defineConfig(({ mode }) => ({
         ...(mode === 'production' && {
           manualChunks: {
             'monaco-editor': ['monaco-editor'],
-            'highlight': ['highlight.js'],
-            'marked': ['marked'],
             'vue-vendor': ['vue', 'vue-router', 'pinia']
           }
         })
