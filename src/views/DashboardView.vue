@@ -6,7 +6,7 @@
         <div class="welcome-content">
           <h2>小工具集</h2>
           <p>快速、轻量的桌面工具</p>
-      </div>
+        </div>
       </div>
     </div>
 
@@ -78,17 +78,17 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 // 系统指标数据
 const systemMetrics = ref({
-      cpu: {
+  cpu: {
     usage: 0,
     cores: 0,
     model: ''
-      },
-      memory: {
+  },
+  memory: {
     total: 0,
     used: 0,
     usagePercent: 0
-      },
-      network: {
+  },
+  network: {
     uploadSpeed: 0,
     downloadSpeed: 0
   }
@@ -197,8 +197,8 @@ onUnmounted(() => {
     margin-bottom: 12px;
 
     .welcome-card {
-    display: flex;
-    align-items: center;
+      display: flex;
+      align-items: center;
       gap: 16px;
       padding: 20px 24px;
       background: var(--card-background);
@@ -270,11 +270,11 @@ onUnmounted(() => {
         span {
           font-size: 12px;
           text-align: center;
-                font-weight: 500;
-              }
-            }
-          }
+          font-weight: 500;
         }
+      }
+    }
+  }
 
   .system-info {
     h3 {
@@ -304,7 +304,7 @@ onUnmounted(() => {
 
         .info-content {
           .info-value {
-          font-size: 18px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--text-color);
             line-height: 1.2;
