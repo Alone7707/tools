@@ -5,6 +5,22 @@ const path = require('path');
 
 let tray = null;
 let isQuitting = false;
+let isPinned = false; // 窗口保留状态
+
+// 辅助函数：根据保留状态显示窗口
+const showWindowWithTaskbarControl = (window) => {
+  if (!window) return;
+
+  window.show();
+  window.focus();
+  window.setAlwaysOnTop(true);
+  window.setAlwaysOnTop(false);
+
+  if (process.platform === 'win32') {
+    // 根据保留状态决定是否在任务栏显示
+    window.setSkipTaskbar(!isPinned);
+  }
+};
 
 // 窗口管理器
 const windowManager = {
@@ -26,15 +42,15 @@ const createWindow = () => {
   windowManager.setWindow('main', mainWindow);
 
   // 初始化IPC管理器
-  new IPCManager(windowManager);
+  const ipcManager = new IPCManager(windowManager);
+  // 传递 isPinned 变量的引用
+  ipcManager.setPinnedRef(() => isPinned, (value) => { isPinned = value; });
 
   // 添加失去焦点时自动隐藏的功能
   mainWindow.on('blur', () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow && !mainWindow.isDestroyed() && !isPinned) {
       mainWindow.hide();
-      if (process.platform === 'win32') {
-        mainWindow.setSkipTaskbar(true);
-      }
+      // 注意：不保留状态下任务栏图标已经在 set-pin-window 中处理了
     }
   });
 
@@ -98,7 +114,6 @@ const updateGlobalShortcut = (newShortcut) => {
 
   registerGlobalShortcut(newShortcut);
 
-  // 更新托盘菜单中的快捷键提示
   if (tray) {
     const contextMenu = Menu.buildFromTemplate([
       {
@@ -118,16 +133,8 @@ const updateGlobalShortcut = (newShortcut) => {
               if (window.isMinimized()) {
                 window.restore();
               }
-              // 显示窗口并置于前台
-              window.show();
-              window.focus();
-              // 强制获得焦点
-              window.setAlwaysOnTop(true);
-              window.setAlwaysOnTop(false);
-              // 在Windows上，确保窗口能够正常显示
-              if (process.platform === 'win32') {
-                window.setSkipTaskbar(false);
-              }
+              // 显示窗口并根据保留状态控制任务栏
+              showWindowWithTaskbarControl(window);
             }
           }
         }
@@ -179,16 +186,8 @@ const registerGlobalShortcut = (shortcut) => {
         if (window.isMinimized()) {
           window.restore();
         }
-        // 显示窗口并置于前台
-        window.show();
-        window.focus();
-        // 强制获得焦点
-        window.setAlwaysOnTop(true);
-        window.setAlwaysOnTop(false);
-        // 在Windows上，确保窗口能够正常显示
-        if (process.platform === 'win32') {
-          window.setSkipTaskbar(false);
-        }
+        // 显示窗口并根据保留状态控制任务栏
+        showWindowWithTaskbarControl(window);
       }
     } else {
       // 如果窗口不存在，创建一个新窗口
@@ -197,13 +196,7 @@ const registerGlobalShortcut = (shortcut) => {
       setTimeout(() => {
         const newWindow = windowManager.getWindow('main');
         if (newWindow) {
-          newWindow.show();
-          newWindow.focus();
-          newWindow.setAlwaysOnTop(true);
-          newWindow.setAlwaysOnTop(false);
-          if (process.platform === 'win32') {
-            newWindow.setSkipTaskbar(false);
-          }
+          showWindowWithTaskbarControl(newWindow);
         }
       }, 100);
     }
@@ -286,16 +279,8 @@ const createTray = () => {
         if (window.isMinimized()) {
           window.restore();
         }
-        // 显示窗口并置于前台
-        window.show();
-        window.focus();
-        // 强制获得焦点
-        window.setAlwaysOnTop(true);
-        window.setAlwaysOnTop(false);
-        // 在Windows上，确保窗口能够正常显示
-        if (process.platform === 'win32') {
-          window.setSkipTaskbar(false);
-        }
+        // 显示窗口并根据保留状态控制任务栏
+        showWindowWithTaskbarControl(window);
       }
     }
   })
@@ -313,6 +298,6 @@ app.on('activate', () => {
   if (window === null) {
     createWindow()
   } else {
-    window.show()
+    showWindowWithTaskbarControl(window)
   }
 })

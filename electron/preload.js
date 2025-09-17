@@ -30,5 +30,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 快捷键相关
   onGetSavedShortcut: (callback) => ipcRenderer.on('get-saved-shortcut', callback),
-  sendSavedShortcut: (shortcut) => ipcRenderer.send('saved-shortcut', shortcut)
+  sendSavedShortcut: (shortcut) => ipcRenderer.send('saved-shortcut', shortcut),
+
+  // 窗口保留功能
+  setPinWindow: (pinned) => ipcRenderer.invoke('set-pin-window', pinned),
+  getPinWindow: () => ipcRenderer.invoke('get-pin-window')
 });

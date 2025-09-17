@@ -5,7 +5,15 @@ const process = require('process');
 class IPCManager {
   constructor(windowManager) {
     this.windowManager = windowManager;
+    this.getPinned = null;
+    this.setPinned = null;
     this.setupHandlers();
+  }
+
+  // 设置 isPinned 变量的引用
+  setPinnedRef(getter, setter) {
+    this.getPinned = getter;
+    this.setPinned = setter;
   }
 
   setupHandlers() {
@@ -216,6 +224,35 @@ class IPCManager {
         global.updateGlobalShortcut(shortcut);
         console.log('从渲染进程加载保存的快捷键:', shortcut);
       }
+    });
+
+    // 窗口保留功能
+    ipcMain.handle('set-pin-window', (event, pinned) => {
+      if (this.setPinned) {
+        this.setPinned(pinned);
+
+        // 根据保留状态设置任务栏显示
+        const window = this.windowManager.getWindow('main');
+        if (window && process.platform === 'win32') {
+          if (pinned) {
+            // 保留窗口时，在任务栏显示
+            window.setSkipTaskbar(false);
+          } else {
+            // 不保留窗口时，从任务栏隐藏
+            window.setSkipTaskbar(true);
+          }
+        }
+
+        return { success: true };
+      }
+      return { success: false, error: 'Pin function not available' };
+    });
+
+    ipcMain.handle('get-pin-window', (event) => {
+      if (this.getPinned) {
+        return this.getPinned();
+      }
+      return false;
     });
   }
 }
