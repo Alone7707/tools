@@ -95,6 +95,19 @@
         </div>
       </div>
 
+      <!-- 开机自启动设置 -->
+      <div class="setting-item">
+        <label>开机自启动:</label>
+        <div class="toggle-wrapper">
+          <input type="checkbox" id="autostart" v-model="autoStartEnabled" @change="updateAutoStart"
+            class="toggle-checkbox" />
+          <label for="autostart" class="toggle-label">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-text">{{ autoStartEnabled ? '已启用' : '已禁用' }}</span>
+        </div>
+      </div>
+
       <!-- 快捷键设置 -->
       <div class="setting-item">
         <label>全局快捷键:</label>
@@ -114,7 +127,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, getCurrentInstance } from 'vue'
+import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
 import { useGlobalStore } from '@/stores/global'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
 
@@ -150,6 +163,9 @@ const textColor = ref(themeStore.themeTextColor || '#333')
 const textSecondaryColor = ref(themeStore.themeTextSecondaryColor || '#666')
 const borderColor = ref(themeStore.themeBorderColor || '#dee2e6')
 const inputBackgroundColor = ref(themeStore.themeInputBackgroundColor || 'white')
+
+// 开机自启动
+const autoStartEnabled = ref(false)
 
 // 全局快捷键
 const shortcutKey = ref(themeStore.globalShortcut || 'Shift+Space')
@@ -398,6 +414,47 @@ const updateShortcutKey = () => {
   }
 }
 
+// 初始化开机自启动状态
+const initAutoStart = async () => {
+  if (window.electronAPI && window.electronAPI.getAutoStart) {
+    try {
+      const enabled = await window.electronAPI.getAutoStart()
+      autoStartEnabled.value = enabled
+    } catch (error) {
+      console.error('获取开机自启动状态失败:', error)
+    }
+  }
+}
+
+// 更新开机自启动设置
+const updateAutoStart = async () => {
+  if (window.electronAPI && window.electronAPI.setAutoStart) {
+    try {
+      const result = await window.electronAPI.setAutoStart(autoStartEnabled.value)
+      if (result && result.success) {
+        console.log('开机自启动设置成功:', autoStartEnabled.value)
+        if (proxy && proxy.$toast) {
+          proxy.$toast.success(autoStartEnabled.value ? '已启用开机自启动' : '已禁用开机自启动')
+        }
+      } else {
+        console.error('开机自启动设置失败:', result ? result.error : '未知错误')
+        // 回滚设置
+        autoStartEnabled.value = !autoStartEnabled.value
+        if (proxy && proxy.$toast) {
+          proxy.$toast.error('开机自启动设置失败，请重试')
+        }
+      }
+    } catch (error) {
+      console.error('调用开机自启动设置API失败:', error)
+      // 回滚设置
+      autoStartEnabled.value = !autoStartEnabled.value
+      if (proxy && proxy.$toast) {
+        proxy.$toast.error('开机自启动设置失败，请重试')
+      }
+    }
+  }
+}
+
 // 应用预设主题
 const applyPresetTheme = (themeName) => {
   let preset = {}
@@ -466,6 +523,11 @@ const applyPresetTheme = (themeName) => {
   // 应用到主题
   updateCustomColors()
 }
+
+// 组件挂载时初始化
+onMounted(() => {
+  initAutoStart()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -537,6 +599,52 @@ const applyPresetTheme = (themeName) => {
           border: none;
           border-radius: 4px;
           cursor: pointer;
+        }
+      }
+
+      .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .toggle-checkbox {
+          display: none;
+        }
+
+        .toggle-label {
+          position: relative;
+          width: 50px;
+          height: 24px;
+          background: #ccc;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+
+          .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+          background: var(--primary-color);
+
+          .toggle-slider {
+            transform: translateX(26px);
+          }
+        }
+
+        .toggle-text {
+          font-size: 14px;
+          color: var(--text-secondary-color);
+          min-width: 60px;
         }
       }
 

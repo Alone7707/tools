@@ -382,6 +382,51 @@ class IPCManager {
       }
       return false;
     });
+
+    // 开机自启动设置
+    ipcMain.handle('set-auto-start', (event, enabled) => {
+      try {
+        const { app } = require('electron');
+
+        if (process.platform === 'darwin') {
+          // macOS
+          app.setLoginItemSettings({
+            openAtLogin: enabled,
+            openAsHidden: true // 启动时隐藏
+          });
+        } else if (process.platform === 'win32') {
+          // Windows
+          app.setLoginItemSettings({
+            openAtLogin: enabled,
+            openAsHidden: true, // 启动时隐藏
+            args: ['--hidden'] // 添加启动参数
+          });
+        } else {
+          // Linux 等其他平台
+          app.setLoginItemSettings({
+            openAtLogin: enabled,
+            openAsHidden: true
+          });
+        }
+
+        console.log(`开机自启动已${enabled ? '启用' : '禁用'}`);
+        return { success: true, enabled };
+      } catch (error) {
+        console.error('设置开机自启动失败:', error);
+        return { success: false, error: error.message };
+      }
+    });
+
+    ipcMain.handle('get-auto-start', (event) => {
+      try {
+        const { app } = require('electron');
+        const loginItemSettings = app.getLoginItemSettings();
+        return loginItemSettings.openAtLogin;
+      } catch (error) {
+        console.error('获取开机自启动状态失败:', error);
+        return false;
+      }
+    });
   }
 }
 

@@ -342,30 +342,33 @@ const copyToClipboard = async (text) => {
 
 <style scoped>
 .encoder-decoder-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 16px;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .header h1 {
-  font-size: 32px;
+  font-size: 22px;
   color: var(--text-color);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-color-secondary);
+  margin: 0;
 }
 
 /* 选项卡样式 */
 .tabs-container {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .tabs {
@@ -380,20 +383,20 @@ const copyToClipboard = async (text) => {
 
 .tab-button {
   flex: 1;
-  min-width: 120px;
-  padding: 12px 16px;
+  min-width: 100px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
   color: var(--text-color-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
 }
 
@@ -495,11 +498,11 @@ const copyToClipboard = async (text) => {
 .input-group textarea,
 .result-group textarea {
   width: 100%;
-  min-height: 80px;
+  min-height: 100px;
   padding: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   font-family: 'Consolas', 'Monaco', monospace;
   background: var(--bg-color-secondary);
   color: var(--text-color);
@@ -516,7 +519,7 @@ const copyToClipboard = async (text) => {
 .button-group {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
@@ -524,12 +527,13 @@ const copyToClipboard = async (text) => {
 .btn-secondary,
 .btn-clear,
 .btn-copy {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn-primary {

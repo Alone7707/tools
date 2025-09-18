@@ -291,44 +291,48 @@ const closeFullscreen = () => {
 
 <style lang="scss" scoped>
 .json-formatter-view {
-  padding: 20px;
+  padding: 16px;
   background: var(--background-color);
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
 
   .tool-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
 
     .header-content {
       h1 {
         color: var(--text-color);
-        margin-bottom: 8px;
-        font-size: 28px;
+        margin-bottom: 6px;
+        font-size: 22px;
       }
 
       p {
         color: var(--text-secondary-color);
-        font-size: 16px;
+        font-size: 14px;
+        margin: 0;
       }
     }
 
     .back-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
+      gap: 6px;
+      padding: 8px 12px;
       background: var(--card-background);
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.2s ease;
+      white-space: nowrap;
 
       &:hover {
         background: rgba(0, 0, 0, 0.05);
@@ -342,35 +346,29 @@ const closeFullscreen = () => {
   }
 
   .tool-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 30px;
-    height: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
 
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
 
     .input-section,
     .output-section {
-      height: 100%;
       background: var(--card-background);
       border-radius: 8px;
       border: 1px solid var(--border-color);
-      padding: 20px;
+      padding: 16px;
 
       h2 {
-        height: 39px;
         color: var(--text-color);
-        margin: 0 0 16px 0;
-        font-size: 20px;
+        margin: 0 0 12px 0;
+        font-size: 18px;
       }
 
       .input-area,
       .output-area {
-        height: 200px;
-        margin-bottom: 16px;
+        height: 150px;
+        margin-bottom: 12px;
 
         .input-textarea {
           width: 100%;
@@ -474,21 +472,21 @@ const closeFullscreen = () => {
 
       .action-buttons,
       .output-actions {
-        height: 39px;
         display: flex;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
 
         button {
           display: flex;
           align-items: center;
-          gap: 6px;
-          padding: 8px 16px;
+          gap: 4px;
+          padding: 6px 12px;
           border-radius: 6px;
-          font-size: 14px;
+          font-size: 13px;
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
+          white-space: nowrap;
 
           &:disabled {
             opacity: 0.5;
@@ -660,13 +658,14 @@ const closeFullscreen = () => {
         button {
           display: flex;
           align-items: center;
-          gap: 6px;
-          padding: 8px 16px;
+          gap: 4px;
+          padding: 6px 12px;
           border-radius: 6px;
-          font-size: 14px;
+          font-size: 13px;
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
+          white-space: nowrap;
           background: var(--card-background);
           color: var(--text-color);
           border: 1px solid var(--border-color);

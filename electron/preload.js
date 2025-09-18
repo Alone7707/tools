@@ -34,5 +34,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 窗口保留功能
   setPinWindow: (pinned) => ipcRenderer.invoke('set-pin-window', pinned),
-  getPinWindow: () => ipcRenderer.invoke('get-pin-window')
+  getPinWindow: () => ipcRenderer.invoke('get-pin-window'),
+
+  // 开机自启动
+  setAutoStart: (enabled) => ipcRenderer.invoke('set-auto-start', enabled),
+  getAutoStart: () => ipcRenderer.invoke('get-auto-start')
 });

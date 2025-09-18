@@ -1,9 +1,9 @@
 // 应用常量
 const APP_CONSTANTS = {
   // 应用信息
-  APP_NAME: 'Electron Tools',
+  APP_NAME: 'ATools',
   APP_VERSION: '1.0.0',
-  
+
   // 窗口配置
   WINDOW_CONFIG: {
     MIN_WIDTH: 800,
@@ -11,14 +11,14 @@ const APP_CONSTANTS = {
     DEFAULT_WIDTH: 1200,
     DEFAULT_HEIGHT: 800
   },
-  
+
   // 文件类型
   SUPPORTED_FILE_TYPES: {
     TEXT: ['txt', 'md', 'json', 'js', 'html', 'css'],
     IMAGE: ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'],
     DOCUMENT: ['pdf', 'doc', 'docx', 'xls', 'xlsx']
   },
-  
+
   // IPC事件名称
   IPC_EVENTS: {
     FILE: {

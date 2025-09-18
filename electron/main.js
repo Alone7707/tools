@@ -7,6 +7,9 @@ let tray = null;
 let isQuitting = false;
 let isPinned = false; // 窗口保留状态
 
+// 检查是否通过开机自启动启动
+const isAutoStarted = process.argv.includes('--hidden') || app.getLoginItemSettings().wasOpenedAtLogin;
+
 // 辅助函数：根据保留状态显示窗口
 const showWindowWithTaskbarControl = (window) => {
   if (!window) return;
@@ -36,7 +39,15 @@ const windowManager = {
 };
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow(createBaseWindowConfig());
+  const config = createBaseWindowConfig();
+
+  // 如果是开机自启动，确保窗口初始状态为隐藏
+  if (isAutoStarted) {
+    config.show = false;
+    config.skipTaskbar = true;
+  }
+
+  const mainWindow = new BrowserWindow(config);
 
   // 将窗口添加到管理器
   windowManager.setWindow('main', mainWindow);
@@ -260,7 +271,7 @@ const createTray = () => {
     }
   ])
 
-  tray.setToolTip('Electron Tools')
+  tray.setToolTip('ATools')
   tray.setContextMenu(contextMenu)
 
   // 双击托盘图标切换主窗口显示/隐藏
