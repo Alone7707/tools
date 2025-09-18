@@ -17,6 +17,9 @@ export const useGlobalStore = defineStore('global', () => {
   // 全局快捷键
   const globalShortcut = ref('Shift+Space');
 
+  // 后台超时设置（分钟）
+  const backgroundTimeout = ref(1);
+
   // 初始化全局快捷键
   const initGlobalShortcut = () => {
     const savedGlobalShortcut = localStorage.getItem('globalShortcut');
@@ -30,6 +33,20 @@ export const useGlobalStore = defineStore('global', () => {
   const setGlobalShortcut = (shortcut) => {
     globalShortcut.value = shortcut;
     localStorage.setItem('globalShortcut', shortcut);
+  }
+
+  // 初始化后台超时设置
+  const initBackgroundTimeout = () => {
+    const savedTimeout = localStorage.getItem('backgroundTimeout');
+    if (savedTimeout) {
+      backgroundTimeout.value = parseInt(savedTimeout, 10);
+    }
+  }
+
+  // 设置后台超时
+  const setBackgroundTimeout = (timeout) => {
+    backgroundTimeout.value = timeout;
+    localStorage.setItem('backgroundTimeout', timeout.toString());
   }
 
   // 初始化主题
@@ -167,13 +184,16 @@ export const useGlobalStore = defineStore('global', () => {
     themeBorderColor,
     themeInputBackgroundColor,
     globalShortcut,
+    backgroundTimeout,
     initTheme,
     initGlobalShortcut,
+    initBackgroundTimeout,
     toggleTheme,
     setTheme,
     setCustomColors,
     enableCustomTheme,
     setGlobalShortcut,
+    setBackgroundTimeout,
     collapsed,
     initMenuState,
     toggleCollapse,

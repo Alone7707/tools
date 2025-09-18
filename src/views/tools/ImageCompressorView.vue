@@ -35,7 +35,11 @@
               </div>
               <div class="info-item">
                 <span class="info-label">压缩率:</span>
-                <span class="info-value">{{ compressionRatio }}</span>
+                <span class="info-value" :class="compressionStatusClass">{{ compressionRatio }}</span>
+              </div>
+              <div class="info-item" v-if="compressionAdvice">
+                <span class="info-label">建议:</span>
+                <span class="info-advice">{{ compressionAdvice }}</span>
               </div>
             </div>
           </div>
@@ -82,6 +86,16 @@
               保持宽高比
             </label>
           </div>
+
+          <div class="setting-group">
+            <label>智能预设:</label>
+            <div class="preset-buttons">
+              <button @click="applyPreset('web')" class="preset-btn" type="button">网页优化</button>
+              <button @click="applyPreset('social')" class="preset-btn" type="button">社交媒体</button>
+              <button @click="applyPreset('email')" class="preset-btn" type="button">邮件附件</button>
+              <button @click="applyPreset('print')" class="preset-btn" type="button">打印质量</button>
+            </div>
+          </div>
         </div>
 
         <div class="action-buttons">
@@ -114,8 +128,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, getCurrentInstance } from 'vue'
 
+const { proxy } = getCurrentInstance()
 // 状态管理
 const selectedImage = ref(null)
 const previewUrl = ref('')
@@ -152,6 +167,39 @@ const compressionRatio = computed(() => {
   return '-'
 })
 
+const compressionStatusClass = computed(() => {
+  if (compressedFileSize.value === 0 || originalFileSize.value === 0) return ''
+
+  const ratio = (1 - compressedFileSize.value / originalFileSize.value) * 100
+
+  if (ratio < 0) return 'negative-compression'  // 负优化
+  if (ratio < 5) return 'poor-compression'      // 压缩效果差
+  if (ratio < 20) return 'fair-compression'     // 一般
+  if (ratio < 50) return 'good-compression'     // 良好
+  return 'excellent-compression'                // 优秀
+})
+
+const compressionAdvice = computed(() => {
+  if (compressedFileSize.value === 0 || originalFileSize.value === 0) return ''
+
+  const ratio = (1 - compressedFileSize.value / originalFileSize.value) * 100
+  const originalSizeKB = originalFileSize.value / 1024
+
+  if (ratio < 0) {
+    return '图片已被优化，无需进一步压缩'
+  }
+  if (ratio < 5) {
+    if (originalSizeKB < 100) {
+      return '小图片压缩效果有限，建议直接使用原图'
+    }
+    return '尝试降低质量或缩小尺寸'
+  }
+  if (ratio < 20) {
+    return '可尝试调整输出格式或降低质量'
+  }
+  return '压缩效果良好'
+})
+
 // 工具函数
 const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes'
@@ -163,6 +211,10 @@ const formatFileSize = (bytes) => {
 
 // 文件处理
 const triggerFileInput = () => {
+  // 通知主进程更新窗口行为
+  if (window.electronAPI) {
+    window.electronAPI.setPinWindow(true)
+  }
   fileInput.value?.click()
 }
 
@@ -176,7 +228,7 @@ const handleFileSelect = (event) => {
 const handleDrop = (event) => {
   event.preventDefault()
   isDragging.value = false
-  
+
   const files = event.dataTransfer.files
   if (files.length > 0 && files[0].type.startsWith('image/')) {
     processImage(files[0])
@@ -194,6 +246,10 @@ const handleDragLeave = (event) => {
 }
 
 const processImage = (file) => {
+  // 通知主进程更新窗口行为
+  if (window.electronAPI) {
+    window.electronAPI.setPinWindow(false)
+  }
   selectedImage.value = file
   originalFileSize.value = file.size
   previewUrl.value = URL.createObjectURL(file)
@@ -214,11 +270,52 @@ const resetImage = () => {
   maintainAspectRatio.value = true
 }
 
+// 智能预设功能
+const applyPreset = (presetType) => {
+  const originalSizeKB = selectedImage.value ? selectedImage.value.size / 1024 : 0
+
+  switch (presetType) {
+    case 'web':
+      // 网页优化：平衡质量和加载速度
+      quality.value = 0.8
+      maxWidth.value = 1920
+      maxHeight.value = 1080
+      outputFormat.value = 'webp'
+      break
+
+    case 'social':
+      // 社交媒体：适合上传到社交平台
+      quality.value = 0.75
+      maxWidth.value = 1200
+      maxHeight.value = 1200
+      outputFormat.value = 'jpeg'
+      break
+
+    case 'email':
+      // 邮件附件：大幅减小文件大小
+      quality.value = 0.6
+      maxWidth.value = 800
+      maxHeight.value = 600
+      outputFormat.value = 'jpeg'
+      break
+
+    case 'print':
+      // 打印质量：保持高质量，适度压缩
+      quality.value = 0.9
+      maxWidth.value = 3000
+      maxHeight.value = 3000
+      outputFormat.value = originalSizeKB < 500 ? 'png' : 'jpeg'
+      break
+  }
+
+  maintainAspectRatio.value = true
+}
+
 const compressImage = async () => {
   if (!selectedImage.value) return
 
   isCompressing.value = true
-  
+
   try {
     const img = new Image()
     img.onload = () => {
@@ -226,11 +323,15 @@ const compressImage = async () => {
       const ctx = canvas.getContext('2d')
 
       let { width, height } = img
+      const originalWidth = width
+      const originalHeight = height
 
-      // 计算缩放比例
+      // 检查是否需要缩放
+      let needsResize = false
       if (maintainAspectRatio.value) {
         const aspectRatio = width / height
         if (width > maxWidth.value || height > maxHeight.value) {
+          needsResize = true
           if (width / maxWidth.value > height / maxHeight.value) {
             width = maxWidth.value
             height = width / aspectRatio
@@ -240,22 +341,128 @@ const compressImage = async () => {
           }
         }
       } else {
-        width = Math.min(width, maxWidth.value)
-        height = Math.min(height, maxHeight.value)
+        if (width > maxWidth.value || height > maxHeight.value) {
+          needsResize = true
+          width = Math.min(width, maxWidth.value)
+          height = Math.min(height, maxHeight.value)
+        }
+      }
+
+      // 智能质量调整：小图片或已经很小的图片使用更高质量
+      let adaptiveQuality = quality.value
+      const originalFileSize = selectedImage.value.size
+
+      // 如果原图很小（< 100KB），提高质量避免负优化
+      if (originalFileSize < 100 * 1024) {
+        adaptiveQuality = Math.max(adaptiveQuality, 0.9)
+      }
+
+      // 如果没有缩放且质量很低，可能导致负优化
+      if (!needsResize && adaptiveQuality < 0.7) {
+        adaptiveQuality = Math.max(adaptiveQuality, 0.8)
       }
 
       canvas.width = width
       canvas.height = height
 
-      // 绘制压缩后的图片
+      // 使用高质量绘制
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(img, 0, 0, width, height)
 
-      // 转换为Blob
-      canvas.toBlob((blob) => {
-        compressedFileSize.value = blob.size
-        compressedImage.value = URL.createObjectURL(blob)
+      // 尝试多种压缩策略
+      const tryCompression = (format, qualityLevel) => {
+        return new Promise((resolve) => {
+          canvas.toBlob((blob) => {
+            resolve({
+              blob,
+              size: blob.size,
+              format,
+              quality: qualityLevel
+            })
+          }, `image/${format}`, qualityLevel)
+        })
+      }
+
+      // 并行尝试多种压缩方案
+      const compressionTasks = []
+
+      // 当前设置的压缩方案
+      compressionTasks.push(tryCompression(outputFormat.value, adaptiveQuality))
+
+      // 如果原图是PNG且要转换为JPEG，也尝试保持PNG格式
+      if (selectedImage.value.type === 'image/png' && outputFormat.value === 'jpeg') {
+        compressionTasks.push(tryCompression('png', Math.min(adaptiveQuality + 0.1, 1.0)))
+      }
+
+      // 尝试WebP格式（通常压缩率更好）
+      if (outputFormat.value !== 'webp') {
+        compressionTasks.push(tryCompression('webp', adaptiveQuality))
+      }
+
+      // 如果质量设置较低，也尝试稍高的质量
+      if (adaptiveQuality < 0.9) {
+        compressionTasks.push(tryCompression(outputFormat.value, Math.min(adaptiveQuality + 0.2, 1.0)))
+      }
+
+      Promise.all(compressionTasks).then(results => {
+        // 找出最优的压缩结果
+        let bestResult = results[0]
+
+        for (const result of results) {
+          // 选择文件大小最小的结果
+          if (result.size < bestResult.size) {
+            bestResult = result
+          }
+        }
+
+        // 检查是否发生了负优化
+        const compressionRatio = (originalFileSize - bestResult.size) / originalFileSize
+
+        if (bestResult.size >= originalFileSize * 0.95) {
+          // 如果压缩后大小超过原图的95%，认为是负优化
+          console.warn('检测到负优化，使用原图')
+
+          // 使用原图
+          compressedFileSize.value = originalFileSize
+          compressedImage.value = previewUrl.value
+
+          // 提示用户
+          setTimeout(() => {
+            alert('检测到压缩效果不佳，已自动使用原图。建议调整压缩参数或直接使用原图。')
+          }, 100)
+        } else {
+          // 使用最优压缩结果
+          compressedFileSize.value = bestResult.size
+          compressedImage.value = URL.createObjectURL(bestResult.blob)
+
+          // 如果使用了不同于用户设置的格式，提示用户
+          if (bestResult.format !== outputFormat.value) {
+            setTimeout(() => {
+              const formatNames = { jpeg: 'JPEG', png: 'PNG', webp: 'WebP' }
+              // alert(`为获得最佳压缩效果，自动选择了${formatNames[bestResult.format]}格式`)
+              proxy.$toast.success(`为获得最佳压缩效果，自动选择了${formatNames[bestResult.format]}格式`)
+            }, 100)
+          }
+        }
+
         isCompressing.value = false
-      }, `image/${outputFormat.value}`, quality.value)
+      }).catch(error => {
+        console.error('压缩优化失败:', error)
+        // 降级到原始压缩方案
+        canvas.toBlob((blob) => {
+          if (blob.size >= originalFileSize * 0.95) {
+            // 负优化，使用原图
+            compressedFileSize.value = originalFileSize
+            compressedImage.value = previewUrl.value
+            alert('压缩效果不佳，已使用原图')
+          } else {
+            compressedFileSize.value = blob.size
+            compressedImage.value = URL.createObjectURL(blob)
+          }
+          isCompressing.value = false
+        }, `image/${outputFormat.value}`, adaptiveQuality)
+      })
     }
 
     img.src = previewUrl.value
@@ -269,6 +476,14 @@ const compressImage = async () => {
 const downloadImage = () => {
   if (!compressedImage.value) return
 
+  // 通知主进程更新窗口行为 - 固定窗口防止消失
+  if (window.electronAPI) {
+    window.electronAPI.setPinWindow(true)
+  }
+
+  // 设置下载完成监听器
+  setupDownloadListener()
+
   const link = document.createElement('a')
   link.href = compressedImage.value
   link.download = `compressed_${selectedImage.value.name}`
@@ -277,14 +492,78 @@ const downloadImage = () => {
   document.body.removeChild(link)
 }
 
+// 下载监听器相关变量
+let downloadTimeoutId = null
+let focusListenerAdded = false
+
+// 焦点处理函数（需要在外部定义以便移除监听器）
+let handleWindowFocus = null
+
+// 设置下载完成监听
+const setupDownloadListener = () => {
+  // 清除之前的监听器和定时器
+  cleanupDownloadListener()
+
+  // 方法1: 监听窗口重新获得焦点（用户关闭了下载对话框）
+  handleWindowFocus = () => {
+    console.log('窗口重新获得焦点，可能下载已完成或取消')
+
+    // 延迟一点时间再取消固定，确保下载对话框完全关闭
+    setTimeout(() => {
+      if (window.electronAPI) {
+        window.electronAPI.setPinWindow(false)
+        console.log('已取消窗口固定')
+      }
+      cleanupDownloadListener()
+    }, 500)
+  }
+
+  // 添加焦点监听器
+  if (!focusListenerAdded) {
+    window.addEventListener('focus', handleWindowFocus)
+    focusListenerAdded = true
+    console.log('已添加下载完成监听器')
+  }
+
+  // 方法2: 设置超时备份（防止焦点事件失效）
+  downloadTimeoutId = setTimeout(() => {
+    console.log('下载超时，自动取消窗口固定')
+    if (window.electronAPI) {
+      window.electronAPI.setPinWindow(false)
+    }
+    cleanupDownloadListener()
+  }, 30000) // 30秒超时
+}
+
+// 清理下载监听器
+const cleanupDownloadListener = () => {
+  // 清除超时定时器
+  if (downloadTimeoutId) {
+    clearTimeout(downloadTimeoutId)
+    downloadTimeoutId = null
+  }
+
+  // 移除焦点监听器
+  if (focusListenerAdded && handleWindowFocus) {
+    window.removeEventListener('focus', handleWindowFocus)
+    focusListenerAdded = false
+    handleWindowFocus = null
+    console.log('已清理下载监听器')
+  }
+}
+
 // 清理
 onUnmounted(() => {
+  // 清理图片URL
   if (previewUrl.value) {
     URL.revokeObjectURL(previewUrl.value)
   }
   if (compressedImage.value) {
     URL.revokeObjectURL(compressedImage.value)
   }
+
+  // 清理下载监听器
+  cleanupDownloadListener()
 })
 </script>
 
@@ -407,6 +686,32 @@ onUnmounted(() => {
             .info-value {
               color: var(--text-color);
               font-weight: bold;
+
+              &.negative-compression {
+                color: #ff4757;
+              }
+
+              &.poor-compression {
+                color: #ffa502;
+              }
+
+              &.fair-compression {
+                color: #2f3640;
+              }
+
+              &.good-compression {
+                color: #2ed573;
+              }
+
+              &.excellent-compression {
+                color: #5352ed;
+              }
+            }
+
+            .info-advice {
+              color: var(--primary-color);
+              font-size: 12px;
+              font-style: italic;
             }
           }
         }
@@ -499,6 +804,29 @@ onUnmounted(() => {
             height: 16px;
           }
         }
+
+        .preset-buttons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          .preset-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--card-background);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: var(--primary-color);
+              color: white;
+              border-color: var(--primary-color);
+            }
+          }
+        }
       }
     }
 
@@ -547,6 +875,17 @@ onUnmounted(() => {
             background: #45a049;
           }
         }
+
+        &.cancel-pin-btn {
+          background: #ff9500;
+          color: white;
+          font-size: 12px;
+          padding: 8px 16px;
+
+          &:hover {
+            background: #e8860a;
+          }
+        }
       }
     }
   }
@@ -585,7 +924,7 @@ onUnmounted(() => {
   @media (max-width: 768px) {
     .image-preview {
       flex-direction: column !important;
-      
+
       .preview-image {
         max-width: 100% !important;
       }

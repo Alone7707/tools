@@ -13,9 +13,13 @@
 
 <script setup>
 import { useGlobalStore } from '@/stores/global'
-import { watch, onMounted } from 'vue'
+import { watch, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import TitleBar from './components/layout/Titlebar.vue'
 import Sidebar from './components/layout/Sidebar.vue'
+
+const router = useRouter()
+const route = useRoute()
 
 const handleMinimize = () => window.electronAPI?.windowMinimize()
 const handleMaximize = () => window.electronAPI?.windowMaximize()
@@ -24,10 +28,64 @@ const handleMinimizeToTray = () => window.electronAPI?.windowMinimizeToTray()
 
 const globalStore = useGlobalStore()
 
+// 后台超时管理
+let backgroundTimeoutId = null
+let isInBackground = false
+
+// 窗口焦点事件处理
+const handleWindowFocus = () => {
+  console.log('应用重新获得焦点')
+  isInBackground = false
+
+  // 清除后台超时定时器
+  if (backgroundTimeoutId) {
+    clearTimeout(backgroundTimeoutId)
+    backgroundTimeoutId = null
+    console.log('已清除后台超时定时器')
+  }
+}
+
+const handleWindowBlur = () => {
+  console.log('应用失去焦点，进入后台')
+  isInBackground = true
+
+  // 设置后台超时定时器
+  const timeoutMs = globalStore.backgroundTimeout * 60 * 1000
+  backgroundTimeoutId = setTimeout(() => {
+    console.log(`后台超时${globalStore.backgroundTimeout}分钟，自动返回首页`)
+
+    // 只有在不是首页时才跳转
+    if (route.path !== '/') {
+      router.push('/')
+      console.log('已自动跳转到首页')
+    }
+
+    backgroundTimeoutId = null
+  }, timeoutMs)
+
+  console.log(`已设置${globalStore.backgroundTimeout}分钟后台超时定时器`)
+}
+
+// 清理后台超时定时器
+const cleanupBackgroundTimeout = () => {
+  if (backgroundTimeoutId) {
+    clearTimeout(backgroundTimeoutId)
+    backgroundTimeoutId = null
+    console.log('已清理后台超时定时器')
+  }
+}
+
 // 初始化主题和菜单状态
 onMounted(() => {
   globalStore.initTheme()
   globalStore.initGlobalShortcut()
+  globalStore.initBackgroundTimeout()
+
+  // 添加窗口焦点事件监听
+  window.addEventListener('focus', handleWindowFocus)
+  window.addEventListener('blur', handleWindowBlur)
+
+  console.log('已添加窗口焦点事件监听器')
 
   // 监听主进程请求获取保存的快捷键
   if (window.electronAPI && window.electronAPI.onGetSavedShortcut) {
@@ -42,6 +100,46 @@ onMounted(() => {
     });
   }
 })
+
+// 组件卸载时清理
+onUnmounted(() => {
+  // 移除事件监听器
+  window.removeEventListener('focus', handleWindowFocus)
+  window.removeEventListener('blur', handleWindowBlur)
+
+  // 清理定时器
+  cleanupBackgroundTimeout()
+
+  console.log('已清理窗口焦点事件监听器和定时器')
+})
+
+// 监听路由变化，用户主动切换路由时重置后台定时器
+watch(() => route.path, (newPath, oldPath) => {
+  if (newPath !== oldPath) {
+    console.log(`路由从 ${oldPath} 切换到 ${newPath}`)
+
+    // 如果在后台状态，重置定时器
+    if (isInBackground && backgroundTimeoutId) {
+      console.log('用户主动切换路由，重置后台定时器')
+      cleanupBackgroundTimeout()
+
+      // 重新设置定时器
+      const timeoutMs = globalStore.backgroundTimeout * 60 * 1000
+      backgroundTimeoutId = setTimeout(() => {
+        console.log(`后台超时${globalStore.backgroundTimeout}分钟，自动返回首页`)
+
+        // 只有在不是首页时才跳转
+        if (route.path !== '/') {
+          router.push('/')
+          console.log('已自动跳转到首页')
+        }
+
+        backgroundTimeoutId = null
+      }, timeoutMs)
+    }
+  }
+})
+
 // 监听主题变化，更新全局样式
 watch(() => globalStore.isDark, (isDark) => {
   if (isDark) {
