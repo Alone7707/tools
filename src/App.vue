@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <TitleBar @minimize="handleMinimize" @maximize="handleMaximize" @minimizeToTray="handleMinimizeToTray" />
+    <TitleBar @minimize="handleMinimize" @maximize="handleMaximize" @minimizeToTray="handleMinimizeToTray"
+      @pinChanged="handlePinChanged" />
 
     <div class="main-container">
       <Sidebar />
@@ -13,7 +14,7 @@
 
 <script setup>
 import { useGlobalStore } from '@/stores/global'
-import { watch, onMounted, onUnmounted } from 'vue'
+import { watch, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import TitleBar from './components/layout/Titlebar.vue'
 import Sidebar from './components/layout/Sidebar.vue'
@@ -26,7 +27,16 @@ const handleMaximize = () => window.electronAPI?.windowMaximize()
 const handleClose = () => window.electronAPI?.windowClose()
 const handleMinimizeToTray = () => window.electronAPI?.windowMinimizeToTray()
 
+// 处理保留窗口状态变化事件
+const handlePinChanged = (pinned) => {
+  console.log('接收到保留窗口状态变化:', pinned)
+  isPinned.value = pinned
+}
+
 const globalStore = useGlobalStore()
+
+// 保留窗口状态
+const isPinned = ref(false)
 
 // 后台超时管理
 let backgroundTimeoutId = null
@@ -49,21 +59,28 @@ const handleWindowBlur = () => {
   console.log('应用失去焦点，进入后台')
   isInBackground = true
 
-  // 设置后台超时定时器
-  const timeoutMs = globalStore.backgroundTimeout * 60 * 1000
-  backgroundTimeoutId = setTimeout(() => {
-    console.log(`后台超时${globalStore.backgroundTimeout}分钟，自动返回首页`)
+  // 只有在窗口未保留时才设置后台超时定时器（此时会自动隐藏到托盘）
+  if (!isPinned.value) {
+    console.log('窗口未保留，设置后台超时定时器')
 
-    // 只有在不是首页时才跳转
-    if (route.path !== '/') {
-      router.push('/')
-      console.log('已自动跳转到首页')
-    }
+    // 设置后台超时定时器
+    const timeoutMs = globalStore.backgroundTimeout * 60 * 1000
+    backgroundTimeoutId = setTimeout(() => {
+      console.log(`后台超时${globalStore.backgroundTimeout}分钟，自动返回首页`)
 
-    backgroundTimeoutId = null
-  }, timeoutMs)
+      // 只有在不是首页时才跳转
+      if (route.path !== '/') {
+        router.push('/')
+        console.log('已自动跳转到首页')
+      }
 
-  console.log(`已设置${globalStore.backgroundTimeout}分钟后台超时定时器`)
+      backgroundTimeoutId = null
+    }, timeoutMs)
+
+    console.log(`已设置${globalStore.backgroundTimeout}分钟后台超时定时器`)
+  } else {
+    console.log('窗口已保留，不设置后台超时定时器')
+  }
 }
 
 // 清理后台超时定时器
@@ -76,10 +93,21 @@ const cleanupBackgroundTimeout = () => {
 }
 
 // 初始化主题和菜单状态
-onMounted(() => {
+onMounted(async () => {
   globalStore.initTheme()
   globalStore.initGlobalShortcut()
   globalStore.initBackgroundTimeout()
+
+  // 获取当前保留窗口状态
+  if (window.electronAPI && window.electronAPI.getPinWindow) {
+    try {
+      isPinned.value = await window.electronAPI.getPinWindow()
+      console.log('获取保留窗口状态:', isPinned.value)
+    } catch (error) {
+      console.error('获取保留窗口状态失败:', error)
+      isPinned.value = false
+    }
+  }
 
   // 添加窗口焦点事件监听
   window.addEventListener('focus', handleWindowFocus)
@@ -113,13 +141,24 @@ onUnmounted(() => {
   console.log('已清理窗口焦点事件监听器和定时器')
 })
 
+// 监听保留窗口状态变化
+watch(isPinned, (newValue) => {
+  console.log('保留窗口状态发生变化:', newValue)
+
+  // 如果切换到保留窗口状态，清除现有的后台定时器
+  if (newValue && backgroundTimeoutId) {
+    console.log('切换到保留窗口，清除后台定时器')
+    cleanupBackgroundTimeout()
+  }
+}, { immediate: false })
+
 // 监听路由变化，用户主动切换路由时重置后台定时器
 watch(() => route.path, (newPath, oldPath) => {
   if (newPath !== oldPath) {
     console.log(`路由从 ${oldPath} 切换到 ${newPath}`)
 
-    // 如果在后台状态，重置定时器
-    if (isInBackground && backgroundTimeoutId) {
+    // 如果在后台状态且窗口未保留，重置定时器
+    if (isInBackground && !isPinned.value && backgroundTimeoutId) {
       console.log('用户主动切换路由，重置后台定时器')
       cleanupBackgroundTimeout()
 

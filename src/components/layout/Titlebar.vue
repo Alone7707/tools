@@ -26,7 +26,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const emit = defineEmits(['minimize', 'maximize', 'minimizeToTray'])
+const emit = defineEmits(['minimize', 'maximize', 'minimizeToTray', 'pinChanged'])
 
 // 保留窗口状态
 const isPinned = ref(false)
@@ -43,6 +43,9 @@ const togglePin = () => {
   if (window.electronAPI) {
     window.electronAPI.setPinWindow(isPinned.value)
   }
+
+  // 发出事件通知App.vue状态变化
+  emit('pinChanged', isPinned.value)
 }
 
 // 组件挂载时获取当前状态
